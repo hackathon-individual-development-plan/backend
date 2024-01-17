@@ -10,8 +10,10 @@ mccabe==0.7.0
 nodeenv==1.8.0
 platformdirs==4.1.0
 pre-commit==3.6.0
+psycopg2-binary==2.9.9
 pycodestyle==2.11.1
 pyflakes==3.2.0
+python-dotenv==1.0.0
 pytz==2023.3.post1
 PyYAML==6.0.1
 sqlparse==0.4.4
