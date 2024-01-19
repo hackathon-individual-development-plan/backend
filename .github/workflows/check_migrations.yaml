@@ -14,7 +14,7 @@ jobs:
       postgres:
         image: postgres
         env:
-          POSTGRES_NAME: ${{env.DB_NAME}}
+          POSTGRES_DB: ${{env.DB_NAME}}
           POSTGRES_USER: ${{env.POSTGRES_USER}}
           POSTGRES_PASSWORD: ${{env.POSTGRES_PASSWORD}}
           POSTGRES_HOST: ${{DB_HOST}}
