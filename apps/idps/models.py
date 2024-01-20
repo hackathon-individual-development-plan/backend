@@ -6,8 +6,10 @@ from django.db.models import UniqueConstraint
 class Task(models.Model):
     """Модель задачи"""
 
-    text = models.TextField("Задача")
-    created_at = models.DateTimeField("Дата создания", auto_now_add=True, db_index=True)
+    text = models.TextField(verbose_name="Задача")
+    created_at = models.DateTimeField(
+        verbose_name="Дата создания", auto_now_add=True, db_index=True
+    )
 
     class Meta:
         verbose_name = "Задача"
@@ -24,14 +26,16 @@ class Goal(models.Model):
     title = models.CharField(
         max_length=settings.FIELD_TITLE_LENGTH, verbose_name="Название Цели"
     )
-    description = models.TextField("Описание Цели")
+    description = models.TextField(verbose_name="Описание Цели")
     tasks = models.ManyToManyField(
         Task,
         blank=False,
         through="GoalTask",
         verbose_name="Задачи",
     )
-    created_at = models.DateTimeField("Дата создания", auto_now_add=True, db_index=True)
+    created_at = models.DateTimeField(
+        verbose_name="Дата создания", auto_now_add=True, db_index=True
+    )
 
     class Meta:
         verbose_name = "Цель"
