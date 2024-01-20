@@ -40,6 +40,7 @@ class UserRole(models.Model):
     role = models.CharField(
         max_length=10,
         choices=Role,
+        default=Role.EMPLOYEE,
         verbose_name="Роль",
     )
 
