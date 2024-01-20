@@ -82,7 +82,8 @@ class ChiefEmployee(models.Model):
     def clean(self):
         if self.chief == self.employee:
             raise ValidationError(
-                "Руководитель не может являться сотрудником самому себе! Сотрудник не может являться руководителем самому себе!"
+                "Руководитель не может являться сотрудником самому себе!"
+                + "Сотрудник не может являться руководителем самому себе!"
             )
         if not UserRole.objects.filter(user=self.chief, role=Role.CHIEF).exists():
             raise ValidationError("Руководитель должен иметь соответствующую роль!")
