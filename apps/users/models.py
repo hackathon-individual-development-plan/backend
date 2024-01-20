@@ -1,7 +1,7 @@
-from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.db.models import UniqueConstraint
 from django.core.exceptions import ValidationError
+from django.db import models
+from django.db.models import UniqueConstraint
 
 
 class Role(models.TextChoices):
@@ -14,10 +14,10 @@ class Role(models.TextChoices):
 class User(AbstractUser):
     """Модель пользователя."""
 
-    fio = models.CharField(
-        max_length=255, blank=False, null=False, verbose_name="ФИО")
+    fio = models.CharField(max_length=255, blank=False, null=False, verbose_name="ФИО")
     job_title = models.CharField(
-        max_length=150, blank=False, null=False, verbose_name="Должность")
+        max_length=150, blank=False, null=False, verbose_name="Должность"
+    )
 
     class Meta:
         swappable = "AUTH_USER_MODEL"
@@ -35,16 +35,13 @@ class UserRole(models.Model):
     """
 
     user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name="user",
-        verbose_name="Пользователь"
+        User, on_delete=models.CASCADE, related_name="user", verbose_name="Пользователь"
     )
     role = models.CharField(
         max_length=10,
         choices=Role,
         verbose_name="Роль",
-        )
+    )
 
     class Meta:
         constraints = [
@@ -63,9 +60,17 @@ class ChiefEmployee(models.Model):
     """
 
     chief = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="chief", verbose_name="Руководитель")
+        User,
+        on_delete=models.CASCADE,
+        related_name="chief",
+        verbose_name="Руководитель",
+    )
     employee = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="employee", verbose_name="Сотрудник")
+        User,
+        on_delete=models.CASCADE,
+        related_name="employee",
+        verbose_name="Сотрудник",
+    )
 
     class Meta:
         constraints = [
@@ -77,7 +82,8 @@ class ChiefEmployee(models.Model):
     def clean(self):
         if self.chief == self.employee:
             raise ValidationError(
-                "Руководитель не может являться сотрудником самому себе! Сотрудник не может являться руководителем самому себе!")
+                "Руководитель не может являться сотрудником самому себе! Сотрудник не может являться руководителем самому себе!"
+            )
         if not UserRole.objects.filter(user=self.chief, role=Role.CHIEF).exists():
             raise ValidationError("Руководитель должен иметь соответствующую роль!")
         if not UserRole.objects.filter(user=self.employee, role=Role.EMPLOYEE).exists():
