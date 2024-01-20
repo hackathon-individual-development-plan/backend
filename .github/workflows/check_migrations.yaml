@@ -6,6 +6,15 @@ on:
       - develop
       - main
 
+env:
+  DJANGO_SECRET_KEY: testsecretkey
+  DB_ENGINE: django.db.backends.postgresql
+  DB_NAME: postgres
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
+  DB_HOST: localhost
+  DB_PORT: 5432
+
 jobs:
   migrations:
     name: Check migrations
