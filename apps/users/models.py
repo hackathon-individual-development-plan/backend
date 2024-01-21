@@ -81,6 +81,13 @@ class ChiefEmployee(models.Model):
         verbose_name_plural = "Сотрудники и руководители"
 
     def clean(self):
+        if self.chief_id is None or self.employee_id is None:
+            raise ValidationError(
+                {
+                    "chief": ["Необходимо выбрать руководителя."],
+                    "employee": ["Необходимо выбрать сотрудника."],
+                }
+            )
         if self.chief == self.employee:
             raise ValidationError(
                 "Руководитель не может являться сотрудником самому себе!"
