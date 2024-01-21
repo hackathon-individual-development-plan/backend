@@ -24,13 +24,20 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "title",
-                    models.CharField(max_length=20, verbose_name="Название Цели"),
+                    models.CharField(
+                        max_length=20, verbose_name="Название Цели"
+                    ),
                 ),
-                ("description", models.TextField(verbose_name="Описание Цели")),
+                (
+                    "description",
+                    models.TextField(verbose_name="Описание Цели"),
+                ),
                 (
                     "created_at",
                     models.DateTimeField(
-                        auto_now_add=True, db_index=True, verbose_name="Дата создания"
+                        auto_now_add=True,
+                        db_index=True,
+                        verbose_name="Дата создания",
                     ),
                 ),
             ],
@@ -56,7 +63,9 @@ class Migration(migrations.Migration):
                 (
                     "created_at",
                     models.DateTimeField(
-                        auto_now_add=True, db_index=True, verbose_name="Дата создания"
+                        auto_now_add=True,
+                        db_index=True,
+                        verbose_name="Дата создания",
                     ),
                 ),
             ],
