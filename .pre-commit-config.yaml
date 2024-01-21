@@ -8,13 +8,12 @@ repos:
     - id: check-yaml
     - id: check-added-large-files
     - id: check-merge-conflict
-#    - id: double-quote-string-fixer
 
 - repo: https://github.com/pycqa/isort
   rev: 5.12.0
   hooks:
     - id: isort
-      args: [--profile, black]
+      args: [--profile, black, --line-length=79]
 
 - repo: https://github.com/pycqa/flake8
   rev: 6.1.0
@@ -29,3 +28,4 @@ repos:
   rev: 23.10.1
   hooks:
     - id: black
+      args: [--line-length=79]
