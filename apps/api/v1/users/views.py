@@ -1,9 +1,10 @@
 from django.db.models import Prefetch
 from rest_framework import viewsets
 
-from apps.api.v1.users.serializers import EmployeeSerializer
 from apps.idps.models import Idp
 from apps.users.models import ChiefEmployee
+
+from .serializers import EmployeeSerializer
 
 
 class EmployeeViewSet(viewsets.ReadOnlyModelViewSet):

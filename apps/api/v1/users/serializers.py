@@ -1,7 +1,8 @@
 from rest_framework import serializers
 
-from apps.api.v1.idps.serializers import IdpForEmployeesSerializer
 from apps.users.models import ChiefEmployee, User
+
+from ..idps.serializers import IdpForEmployeesSerializer
 
 
 class UserSerializer(serializers.ModelSerializer):
