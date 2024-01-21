@@ -42,7 +42,7 @@ class GoalAdmin(admin.ModelAdmin):
 
 
 @admin.register(Idp)
-class IpdAdmin(admin.ModelAdmin):
+class IdpAdmin(admin.ModelAdmin):
     @admin.display(description="Цели")
     def goal_list(self, obj):
         return list(goal for goal in obj.goals.all())
