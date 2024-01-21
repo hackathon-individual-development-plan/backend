@@ -11,6 +11,12 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ["fio", "job_title"]
 
 
+class UserFIOSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["fio"]
+
+
 class EmployeeSerializer(serializers.ModelSerializer):
     employee = UserSerializer()
     idp = IdpForEmployeesSerializer(
@@ -20,3 +26,11 @@ class EmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ChiefEmployee
         fields = ["employee", "idp"]
+
+
+class EmployeeWithoutIdpSerializer(serializers.ModelSerializer):
+    employee = UserFIOSerializer()
+
+    class Meta:
+        model = ChiefEmployee
+        fields = ["employee"]
