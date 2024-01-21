@@ -9,6 +9,8 @@ from .serializers import EmployeeSerializer, EmployeeWithoutIdpSerializer
 
 
 class EmployeeViewSet(viewsets.GenericViewSet):
+    """Вьюсет, который используется для получения списка сотрудников текущего руководителя и информации об их ИПР (айди, название, статус)."""
+
     serializer_class = EmployeeSerializer
 
     # TODO: ЗАГЛУШКА
@@ -29,6 +31,8 @@ class EmployeeViewSet(viewsets.GenericViewSet):
 
 
 class EmployeeWithoutIdpViewSet(viewsets.GenericViewSet):
+    """Вьюсет, который используется для получения списка сотрудников текущего руководителя, у которых отсутствует ИПР в статусе В работе."""
+
     serializer_class = EmployeeWithoutIdpSerializer
 
     employees_with_idp = Idp.objects.filter(
