@@ -4,6 +4,39 @@ from django.db import models
 from django.db.models import UniqueConstraint
 
 
+class CommonCleanMixin(models.Model):
+    """Выполняет общие проверки для моделей, наследующих CommonCleanMixin.
+
+    Используется в моделях ChiefEmployee и Idp.
+    """
+
+    class Meta:
+        abstract = True
+
+    def clean(self):
+        if self.chief_id is None or self.employee_id is None:
+            raise ValidationError(
+                {
+                    "chief": ["Необходимо выбрать руководителя."],
+                    "employee": ["Необходимо выбрать сотрудника."],
+                }
+            )
+        if self.chief == self.employee:
+            raise ValidationError("Вы не можете назначать самого себя!")
+        if not UserRole.objects.filter(
+            user=self.chief, role=Role.CHIEF
+        ).exists():
+            raise ValidationError(
+                "Руководитель должен иметь соответствующую роль!"
+            )
+        if not UserRole.objects.filter(
+            user=self.employee, role=Role.EMPLOYEE
+        ).exists():
+            raise ValidationError(
+                "Сотрудник должен иметь соответствующую роль!"
+            )
+
+
 class Role(models.TextChoices):
     """Варианты ролей пользователя."""
 
@@ -60,7 +93,7 @@ class UserRole(models.Model):
         return f"{self.user.username} - {self.get_role_display()}"
 
 
-class ChiefEmployee(models.Model):
+class ChiefEmployee(CommonCleanMixin, models.Model):
     """
     Модель для связи между руководителями и их сотрудниками.
     """
@@ -86,36 +119,6 @@ class ChiefEmployee(models.Model):
         ]
         verbose_name = "Сотрудник и руководитель"
         verbose_name_plural = "Сотрудники и руководители"
-
-    def clean(self):
-        if self.chief_id is None or self.employee_id is None:
-            raise ValidationError(
-                {
-                    "chief": ["Необходимо выбрать руководителя."],
-                    "employee": ["Необходимо выбрать сотрудника."],
-                }
-            )
-        if self.chief == self.employee:
-            raise ValidationError(
-                "Руководитель не может являться сотрудником самому себе!"
-                + "Сотрудник не может являться руководителем самому себе!"
-            )
-        if not UserRole.objects.filter(
-            user=self.chief, role=Role.CHIEF
-        ).exists():
-            raise ValidationError(
-                "Руководитель должен иметь соответствующую роль!"
-            )
-        if not UserRole.objects.filter(
-            user=self.employee, role=Role.EMPLOYEE
-        ).exists():
-            raise ValidationError(
-                "Сотрудник должен иметь соответствующую роль!"
-            )
-
-    def save(self, *args, **kwargs):
-        self.clean()
-        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.chief.username} - {self.employee.username}"
