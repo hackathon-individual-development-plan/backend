@@ -9,7 +9,7 @@ class GoalTaskAdmin(admin.TabularInline):
     min_num = 1
 
 
-class GoalForIprAdmin(admin.TabularInline):
+class GoalForIdpAdmin(admin.TabularInline):
     model = GoalForIdp
     min_num = 1
 
@@ -42,7 +42,7 @@ class GoalAdmin(admin.ModelAdmin):
 
 
 @admin.register(Idp)
-class IprAdmin(admin.ModelAdmin):
+class IpdAdmin(admin.ModelAdmin):
     @admin.display(description="Цели")
     def goal_list(self, obj):
         return list(goal for goal in obj.goals.all())
@@ -59,7 +59,7 @@ class IprAdmin(admin.ModelAdmin):
     search_fields = ("title", "chief", "employee", "status")
     list_filter = ("created_at", "chief", "employee", "status")
     inlines = [
-        GoalForIprAdmin,
+        GoalForIdpAdmin,
     ]
     empty_value_display = "-пусто-"
 

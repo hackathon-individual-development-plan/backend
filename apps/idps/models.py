@@ -94,13 +94,13 @@ class Idp(models.Model):
         User,
         on_delete=models.CASCADE,
         verbose_name="Сотрудник",
-        related_name="my_ipr",
+        related_name="my_idp",
     )
     chief = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         verbose_name="Руководитель",
-        related_name="ipr_for_employee",
+        related_name="idp_for_employee",
     )
     goals = models.ManyToManyField(
         Goal, through="GoalForIdp", verbose_name="Цели"
@@ -124,7 +124,7 @@ class Idp(models.Model):
         constraints = [
             UniqueConstraint(
                 fields=["title", "chief", "employee"],
-                name="unique_ipr_for_employee",
+                name="unique_idp_for_employee",
             ),
             CheckConstraint(
                 name="self_follow",
