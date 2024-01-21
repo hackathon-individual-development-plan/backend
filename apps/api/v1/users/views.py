@@ -9,7 +9,10 @@ from .serializers import EmployeeSerializer, EmployeeWithoutIdpSerializer
 
 
 class EmployeeViewSet(viewsets.GenericViewSet):
-    """Вьюсет, который используется для получения списка сотрудников текущего руководителя и информации об их ИПР (айди, название, статус)."""
+    """Вьюсет используется для получения списка сотрудников
+    текущего пользователя - руководителя -
+    и информации об их ИПР (айди, название, статус).
+    """
 
     serializer_class = EmployeeSerializer
 
@@ -31,7 +34,10 @@ class EmployeeViewSet(viewsets.GenericViewSet):
 
 
 class EmployeeWithoutIdpViewSet(viewsets.GenericViewSet):
-    """Вьюсет, который используется для получения списка сотрудников текущего руководителя, у которых отсутствует ИПР в статусе В работе."""
+    """Вьюсет используется для получения списка сотрудников
+    текущего пользователя - руководителя, -
+    у которых отсутствует ИПР в статусе В работе.
+    """
 
     serializer_class = EmployeeWithoutIdpSerializer
 

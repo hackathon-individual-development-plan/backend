@@ -6,7 +6,7 @@ from ..idps.serializers import IdpForEmployeesSerializer
 
 
 class UserSerializer(serializers.ModelSerializer):
-    """Сериализация данных о сотруднике: фамилия и должность.
+    """Сериализация данных о сотруднике: ФИО и должность.
 
     Используется в сериализаторе EmployeeSerializer.
     """
@@ -17,7 +17,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserFIOSerializer(serializers.ModelSerializer):
-    """Сериализация данных о сотруднике: фамилия.
+    """Сериализация данных о сотруднике: ФИО.
 
     Используется в сериализаторе EmployeeWithoutIdpSerializer.
     """
@@ -41,7 +41,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
 
 
 class EmployeeWithoutIdpSerializer(serializers.ModelSerializer):
-    """Сериализация данных о сотрудниках, у которых нет ИПР в статусе В работе."""
+    """Сериализация данных о сотрудниках, у которых нет ИПР в работе."""
 
     employee = UserFIOSerializer()
 
