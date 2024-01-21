@@ -72,7 +72,7 @@ class GoalTask(models.Model):
         on_delete=models.CASCADE,
         null=False,
         related_name="goals",
-        verbose_name="Цель",
+        verbose_name="Задачи",
     )
 
     class Meta:
@@ -86,7 +86,7 @@ class GoalTask(models.Model):
         return f"Цель {self.goal.title} включает задачу {self.tasks.text}"
 
 
-class Ipr(models.Model):
+class Idp(models.Model):
     title = models.CharField(
         max_length=settings.FIELD_TITLE_LENGTH, verbose_name="Наименование ИПР"
     )
@@ -94,16 +94,16 @@ class Ipr(models.Model):
         User,
         on_delete=models.CASCADE,
         verbose_name="Сотрудник",
-        related_name="my_ipr",
+        related_name="my_idp",
     )
     chief = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         verbose_name="Руководитель",
-        related_name="ipr_for_employee",
+        related_name="idp_for_employee",
     )
     goals = models.ManyToManyField(
-        Goal, through="GoalForIpr", verbose_name="Цели"
+        Goal, through="GoalForIdp", verbose_name="Цели"
     )
     status = models.CharField(
         max_length=max([len(status) for status in Status]),
@@ -124,7 +124,7 @@ class Ipr(models.Model):
         constraints = [
             UniqueConstraint(
                 fields=["title", "chief", "employee"],
-                name="unique_ipr_for_employee",
+                name="unique_idp_for_employee",
             ),
             CheckConstraint(
                 name="self_follow",
@@ -160,7 +160,7 @@ class Ipr(models.Model):
             raise ValidationError("Возможно это не ваш сотрудник?")
 
 
-class GoalForIpr(models.Model):
+class GoalForIdp(models.Model):
     """Модель цели со статусом для конкретного ИПР"""
 
     goal = models.ForeignKey(
@@ -169,7 +169,7 @@ class GoalForIpr(models.Model):
         null=False,
         on_delete=models.CASCADE,
         verbose_name="Цель",
-        related_name="ipr_goals",
+        related_name="idp_goals",
     )
     status = models.CharField(
         max_length=max([len(status) for status in Status]),
@@ -183,10 +183,10 @@ class GoalForIpr(models.Model):
     deadline = models.DateTimeField(
         verbose_name="Дата дедлайна", db_index=True
     )
-    ipr = models.ForeignKey(
-        Ipr,
+    idp = models.ForeignKey(
+        Idp,
         on_delete=models.CASCADE,
-        related_name="ipr_goals",
+        related_name="idp_goals",
         verbose_name="ИПР",
     )
     finished_at = models.DateTimeField(
@@ -196,10 +196,10 @@ class GoalForIpr(models.Model):
     class Meta:
         verbose_name = "Цель ИПР"
         verbose_name_plural = "Цели для ИПР"
-        ordering = ("created_at", "ipr__title", "status", "deadline")
+        ordering = ("created_at", "idp__title", "status", "deadline")
 
     def __str__(self):
         return (
-            f"ИПР:{self.ipr}, Цель:{self.goal},\n"
+            f"ИПР:{self.idp}, Цель:{self.goal},\n"
             f"Статус: {self.status},\n Дедлайн: {self.deadline}"
         )
