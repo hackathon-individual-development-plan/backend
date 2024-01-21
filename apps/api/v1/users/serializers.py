@@ -1,5 +1,6 @@
-from models import ChiefEmployee, User, UserRole
 from rest_framework import serializers
+
+from apps.users.models import ChiefEmployee, User, UserRole
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -18,3 +19,9 @@ class ChiefEmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ChiefEmployee
         fields = ["id", "chief", "employee"]
+
+
+class EmployeeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ChiefEmployee
+        fields = ["employee"]
