@@ -6,4 +6,4 @@ from apps.idps.models import Idp
 class IdpForEmployeesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Idp
-        fields = ["title", "status"]
+        fields = ["id", "title", "status"]
