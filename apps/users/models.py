@@ -53,6 +53,9 @@ class User(AbstractUser):
     job_title = models.CharField(
         max_length=150, blank=False, null=False, verbose_name="Должность"
     )
+    photo = models.ImageField(
+        upload_to="user_photos/", blank=True, null=True, verbose_name="Фото"
+    )
 
     class Meta:
         swappable = "AUTH_USER_MODEL"
