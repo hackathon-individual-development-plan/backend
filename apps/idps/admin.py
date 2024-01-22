@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group
 
-from apps.idps.models import Goal, GoalForIdp, GoalTask, Idp, Task
+from apps.idps.models import Goal, GoalForIdp, GoalTask, Idp, Task, Comment
 
 
 class GoalTaskAdmin(admin.TabularInline):
@@ -64,4 +64,5 @@ class IdpAdmin(admin.ModelAdmin):
     empty_value_display = "-пусто-"
 
 
+admin.site.register(Comment)
 admin.site.unregister(Group)
