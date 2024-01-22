@@ -1,6 +1,7 @@
 from django.db.models import OuterRef, Prefetch, Subquery
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
+from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
 
@@ -8,7 +9,10 @@ from apps.idps.models import Idp, Status
 from apps.users.models import ChiefEmployee
 
 from .filters import EmployeeWithoutIdpFilter
-from .serializers import EmployeeSerializer, EmployeeWithoutIdpSerializer
+from .serializers.employees import (
+    EmployeeSerializer,
+    EmployeeWithoutIdpSerializer,
+)
 
 
 class EmployeeViewSet(viewsets.GenericViewSet):
@@ -41,7 +45,7 @@ class EmployeeViewSet(viewsets.GenericViewSet):
     )
 
     def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
+        queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
@@ -72,6 +76,44 @@ class EmployeeWithoutIdpViewSet(viewsets.GenericViewSet):
     )
 
     def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
+        queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+
+class EmployeeIdpViewSet(viewsets.GenericViewSet):
+    """Вьюсет используется для получения данных о последнем ИПР
+    (Мой ИПР) текущего пользователя - сотрудника.
+    """
+
+    # TODO: ЗАГЛУШКА
+    # после мержа ИПР сериализатора
+    # заменить на serializer_class = EmployeeMyIdpSerializer
+    serializer_class = EmployeeSerializer
+
+    latest_idp = (
+        Idp.objects.filter(employee_id=OuterRef("employee_id"))
+        .order_by("-created_at")
+        .values("id")[:1]
+    )
+
+    # TODO: ЗАГЛУШКА
+    # после реализации авторизации взять юзера из request (self.request.user)
+    # def get_queryset(self):
+    #     employee = self.request.user
+    #     return ChiefEmployee.objects.filter(employee=employee).prefetch_related(
+    #         Prefetch("employee__my_idp",
+    #                  queryset=Idp.objects.filter(id__in=Subquery(latest_idp)))
+
+    queryset = ChiefEmployee.objects.filter(employee=2).prefetch_related(
+        Prefetch(
+            "employee__my_idp",
+            queryset=Idp.objects.filter(id__in=Subquery(latest_idp)),
+        )
+    )
+
+    @action(detail=False, methods=["get"], url_path="my-idp")
+    def get_my_idp(self, request):
+        instance = self.queryset.get()
+        serializer = self.get_serializer(instance)
         return Response(serializer.data)
