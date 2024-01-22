@@ -208,25 +208,19 @@ class GoalForIdp(models.Model):
 class Comment(models.Model):
     """Модель комментариев к целям."""
 
-    comment_text = models.TextField(
-        verbose_name="Текст комментария"
-    )
+    comment_text = models.TextField(verbose_name="Текст комментария")
     goal_id = models.ForeignKey(
         Goal,
         blank=False,
         null=False,
         on_delete=models.CASCADE,
-        verbose_name="Цель"
+        verbose_name="Цель",
     )
     user_id = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        verbose_name="Автор комментария"
+        User, on_delete=models.CASCADE, verbose_name="Автор комментария"
     )
     created_at = models.DateTimeField(
-        verbose_name="Дата создания",
-        auto_now_add=True,
-        db_index=True
+        verbose_name="Дата создания", auto_now_add=True, db_index=True
     )
 
     class Meta:

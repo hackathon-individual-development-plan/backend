@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group
 
-from apps.idps.models import Goal, GoalForIdp, GoalTask, Idp, Task, Comment
+from apps.idps.models import Comment, Goal, GoalForIdp, GoalTask, Idp, Task
 
 
 class GoalTaskAdmin(admin.TabularInline):
