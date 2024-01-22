@@ -1,4 +1,4 @@
-from django.db.models import Prefetch
+from django.db.models import OuterRef, Prefetch, Subquery
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
 from rest_framework.filters import SearchFilter
@@ -19,15 +19,25 @@ class EmployeeViewSet(viewsets.GenericViewSet):
 
     serializer_class = EmployeeSerializer
 
+    latest_idp = (
+        Idp.objects.filter(employee_id=OuterRef("employee_id"))
+        .order_by("-created_at")
+        .values("id")[:1]
+    )
+
     # TODO: ЗАГЛУШКА
     # после реализации авторизации взять юзера из request (self.request.user)
     # def get_queryset(self):
     #     chief = self.request.user
     #     return ChiefEmployee.objects.filter(chief=chief).prefetch_related(
-    #         Prefetch("employee__my_idp", queryset=Idp.objects.all()))
+    #         Prefetch("employee__my_idp",
+    #                  queryset=Idp.objects.filter(id__in=Subquery(latest_idp)))
 
     queryset = ChiefEmployee.objects.filter(chief=1).prefetch_related(
-        Prefetch("employee__my_idp", queryset=Idp.objects.all())
+        Prefetch(
+            "employee__my_idp",
+            queryset=Idp.objects.filter(id__in=Subquery(latest_idp)),
+        )
     )
 
     def list(self, request, *args, **kwargs):
