@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import CheckConstraint, UniqueConstraint
 
-from apps.users.models import ChiefEmployee, Role, User, UserRole
+from apps.users.models import ChiefEmployee, CommonCleanMixin, User
 
 
 class Status(models.TextChoices):
@@ -86,7 +86,7 @@ class GoalTask(models.Model):
         return f"Цель {self.goal.title} включает задачу {self.tasks.text}"
 
 
-class Idp(models.Model):
+class Idp(CommonCleanMixin, models.Model):
     title = models.CharField(
         max_length=settings.FIELD_TITLE_LENGTH, verbose_name="Наименование ИПР"
     )
@@ -140,20 +140,7 @@ class Idp(models.Model):
         )
 
     def clean(self):
-        if self.employee == self.chief:
-            raise ValidationError("Вы не можете назначить ИПР самому себе")
-        if not UserRole.objects.filter(
-            user=self.chief, role=Role.CHIEF
-        ).exists():
-            raise ValidationError(
-                "Руководитель должен иметь соответствующую роль!"
-            )
-        if not UserRole.objects.filter(
-            user=self.employee, role=Role.EMPLOYEE
-        ).exists():
-            raise ValidationError(
-                "Сотрудник должен иметь соответствующую роль!"
-            )
+        super().clean()
         if not ChiefEmployee.objects.filter(
             chief=self.chief, employee=self.employee
         ).exists():
