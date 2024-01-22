@@ -5,8 +5,6 @@ from apps.users.models import ChiefEmployee
 from ...idps.serializers import IdpForEmployeesSerializer
 from .users import UserFIOSerializer, UserSerializer
 
-# , IdpSerializer
-
 
 class EmployeeSerializer(serializers.ModelSerializer):
     """Сериализация данных о сотрудниках и их ИПР (id, название, статус)."""
