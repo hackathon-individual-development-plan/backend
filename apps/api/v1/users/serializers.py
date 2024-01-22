@@ -1,8 +1,18 @@
 from rest_framework import serializers
 
+from apps.idps.models import Idp
 from apps.users.models import ChiefEmployee, User
 
-from ..idps.serializers import IdpForEmployeesSerializer
+
+class IdpForEmployeesSerializer(serializers.ModelSerializer):
+    """Сериализация данных об ИПР.
+
+    Используется в сериализаторе EmployeeSerializer.
+    """
+
+    class Meta:
+        model = Idp
+        fields = ["id", "title", "status"]
 
 
 class UserSerializer(serializers.ModelSerializer):
