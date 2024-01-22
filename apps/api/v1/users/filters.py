@@ -1,6 +1,6 @@
 from django_filters.rest_framework import CharFilter, FilterSet
 
-from apps.users.models import ChiefEmployee
+from apps.users.models import User
 
 
 class EmployeeWithoutIdpFilter(FilterSet):
@@ -9,7 +9,7 @@ class EmployeeWithoutIdpFilter(FilterSet):
     name = CharFilter(lookup_expr="istartswith")
 
     class Meta:
-        model = ChiefEmployee
+        model = User
         fields = [
             "fio",
         ]
