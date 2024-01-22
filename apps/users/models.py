@@ -125,3 +125,11 @@ class ChiefEmployee(CommonCleanMixin, models.Model):
 
     def __str__(self):
         return f"{self.chief.username} - {self.employee.username}"
+
+    def clean(self):
+        super().clean()
+        chiefs_count = ChiefEmployee.objects.filter(
+            employee=self.employee
+        ).count()
+        if chiefs_count > 0:
+            raise ValidationError("У сотрудника уже есть руководитель!")
