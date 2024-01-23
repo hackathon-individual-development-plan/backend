@@ -6,7 +6,7 @@ from .models import ChiefEmployee, User, UserRole
 
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
-    fieldsets = ((None, {"fields": ("fio", "job_title")}),)
+    fieldsets = ((None, {"fields": ("fio", "job_title", "photo")}),)
     list_display = (
         "id",
         "username",

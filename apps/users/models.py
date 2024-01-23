@@ -53,6 +53,9 @@ class User(AbstractUser):
     job_title = models.CharField(
         max_length=150, blank=False, null=False, verbose_name="Должность"
     )
+    photo = models.ImageField(
+        upload_to="user_photos/", blank=True, null=True, verbose_name="Фото"
+    )
 
     class Meta:
         swappable = "AUTH_USER_MODEL"
@@ -122,3 +125,11 @@ class ChiefEmployee(CommonCleanMixin, models.Model):
 
     def __str__(self):
         return f"{self.chief.username} - {self.employee.username}"
+
+    def clean(self):
+        super().clean()
+        chiefs_count = ChiefEmployee.objects.filter(
+            employee=self.employee
+        ).count()
+        if chiefs_count > 0:
+            raise ValidationError("У сотрудника уже есть руководитель!")
