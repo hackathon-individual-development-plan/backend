@@ -11,12 +11,6 @@ class TaskSerializer(serializers.ModelSerializer):
         fields = ("text",)
 
 
-# class GoalSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Goal
-#         fields = ("title", "description")
-
-
 class GoalTaskSerializer(serializers.ModelSerializer):
     text = serializers.ReadOnlyField(source="tasks.text")
 
@@ -66,6 +60,9 @@ class IdpSerializer(serializers.ModelSerializer):
         fields = ("id", "title", "goals", "employee", "chief", "status")
 
 
+# TODO добавить комменты
+
+
 class PostIdpSerializer(serializers.ModelSerializer):
     goals = PostGoalForIdpSerializer(many=True)
     employee = serializers.SlugRelatedField(
@@ -79,16 +76,11 @@ class PostIdpSerializer(serializers.ModelSerializer):
 
     def create_tasks_for_goal(self, tasks, goal):
         list_of_task = [Task(text=task["text"]) for task in tasks]
-        list_of_task_obj = Task.objects.bulk_create(
-            list_of_task, ignore_conflicts=True
-        )
+        list_of_task_obj = Task.objects.bulk_create(list_of_task)
         list_of_goaltask = [
             GoalTask(goal_id=goal.id, tasks=task) for task in list_of_task_obj
         ]
-        try:
-            GoalTask.objects.bulk_create(list_of_goaltask)
-        except ValueError as error:
-            print(error)
+        GoalTask.objects.bulk_create(list_of_goaltask)
 
     def create_goals_for_idp(self, goals, idp):
         list_of_goal_for_ipr = []

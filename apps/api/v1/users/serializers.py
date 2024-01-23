@@ -23,7 +23,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id", "fio", "job_title"]
+        fields = ["fio", "job_title"]
 
 
 class UserFIOSerializer(serializers.ModelSerializer):
