@@ -1,7 +1,17 @@
 from rest_framework import serializers
 
-from apps.api.v1.users.serializers import UserSerializer
+from apps.api.v1.users.serializers.users import UserSerializer
 from apps.idps.models import GoalForIdp, GoalTask, Idp
+
+
+class IdpForEmployeesSerializer(serializers.ModelSerializer):
+    """Сериализация данных об ИПР.
+    Используется в сериализаторе EmployeeSerializer.
+    """
+
+    class Meta:
+        model = Idp
+        fields = ["id", "title", "status"]
 
 
 class GoalTaskSerializer(serializers.ModelSerializer):
