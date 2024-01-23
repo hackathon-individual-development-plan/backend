@@ -64,5 +64,20 @@ class IdpAdmin(admin.ModelAdmin):
     empty_value_display = "-пусто-"
 
 
-admin.site.register(Comment)
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = (
+        "pk",
+        "title",
+        "chief",
+        "employee",
+        "goal_list",
+        "status",
+        "created_at",
+    )
+    search_fields = ("goal_id", "user_id", "created_at")
+    list_filter = ("goal_id", "user_id", "created_at")
+    empty_value_display = "-пусто-"
+
+
 admin.site.unregister(Group)

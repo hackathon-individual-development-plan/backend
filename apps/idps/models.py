@@ -226,3 +226,6 @@ class Comment(models.Model):
     class Meta:
         verbose_name = "Комментарий"
         verbose_name_plural = "Комментарии"
+
+    def __str__(self):
+        return f"Комментарий пользователя: {self.user_id.get_full_name()}"
