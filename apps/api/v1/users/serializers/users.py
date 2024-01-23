@@ -4,7 +4,7 @@ from apps.users.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
-    """Сериализация данных о сотруднике: ФИО и должность.
+    """Сериализация данных о сотруднике: ФИО, должность и фото.
 
     Используется в сериализаторе EmployeeSerializer.
     """

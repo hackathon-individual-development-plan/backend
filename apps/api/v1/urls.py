@@ -1,6 +1,7 @@
 from django.urls import include, path
 from rest_framework import routers
 
+from .idps.views import IdpViewSet
 from .users.views import (
     EmployeeIdpViewSet,
     EmployeeViewSet,
@@ -21,5 +22,7 @@ router.register(
     EmployeeIdpViewSet,
     basename="employee",
 )
+router.register("idps", IdpViewSet, basename="idps")
+
 
 urlpatterns = [path("", include(router.urls))]
