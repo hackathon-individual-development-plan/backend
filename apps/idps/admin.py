@@ -68,11 +68,9 @@ class IdpAdmin(admin.ModelAdmin):
 class CommentAdmin(admin.ModelAdmin):
     list_display = (
         "pk",
-        "title",
-        "chief",
-        "employee",
-        "goal_list",
-        "status",
+        "comment_text",
+        "goal_id",
+        "user_id",
         "created_at",
     )
     search_fields = ("goal_id", "user_id", "created_at")
