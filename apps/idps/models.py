@@ -65,7 +65,11 @@ class GoalTask(models.Model):
     """Модель для связи целей с задачами"""
 
     goal = models.ForeignKey(
-        Goal, on_delete=models.CASCADE, null=False, verbose_name="Цель"
+        Goal,
+        on_delete=models.CASCADE,
+        null=False,
+        # related_name="tasks",
+        verbose_name="Цель",
     )
     tasks = models.ForeignKey(
         Task,
@@ -74,6 +78,9 @@ class GoalTask(models.Model):
         related_name="goals",
         verbose_name="Задачи",
     )
+
+    def __repr__(self):
+        return f"Goal_id: {self.goal.pk}" f"Task_id: {self.tasks.id}"
 
     class Meta:
         constraints = [

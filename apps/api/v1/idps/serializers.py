@@ -1,16 +1,28 @@
 from rest_framework import serializers
 
 from apps.api.v1.users.serializers import UserSerializer
-from apps.idps.models import GoalForIdp, GoalTask, Idp
+from apps.idps.models import Goal, GoalForIdp, GoalTask, Idp, Task
+from apps.users.models import User
+
+
+class TaskSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Task
+        fields = ("text",)
+
+
+# class GoalSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Goal
+#         fields = ("title", "description")
 
 
 class GoalTaskSerializer(serializers.ModelSerializer):
-    id = serializers.ReadOnlyField(source="tasks.id")
     text = serializers.ReadOnlyField(source="tasks.text")
 
     class Meta:
         model = GoalForIdp
-        fields = ("id", "text")
+        fields = ("text",)
 
 
 class GoalForIdpSerializer(serializers.ModelSerializer):
@@ -29,6 +41,16 @@ class GoalForIdpSerializer(serializers.ModelSerializer):
         fields = ("id", "title", "deadline", "status", "description", "tasks")
 
 
+class PostGoalForIdpSerializer(serializers.ModelSerializer):
+    tasks = TaskSerializer(many=True)
+    title = serializers.CharField()
+    description = serializers.CharField()
+
+    class Meta:
+        model = GoalForIdp
+        fields = ("title", "description", "deadline", "tasks")
+
+
 class IdpSerializer(serializers.ModelSerializer):
     goals = serializers.SerializerMethodField()
     employee = UserSerializer(read_only=True)
@@ -44,10 +66,53 @@ class IdpSerializer(serializers.ModelSerializer):
         fields = ("id", "title", "goals", "employee", "chief", "status")
 
 
-# class PostIdpSerializer(serializers.ModelSerializer):
-#
-#     class Meta:
-#         model = Idp
-#         fields = (
-#             "id", "title", "goals", "employee", "chief", "status"
-#         )
+class PostIdpSerializer(serializers.ModelSerializer):
+    goals = PostGoalForIdpSerializer(many=True)
+    employee = serializers.SlugRelatedField(
+        queryset=User.objects.all(), slug_field="id"
+    )
+
+    class Meta:
+        model = Idp
+        fields = ("title", "goals", "employee", "chief")
+        read_only_fields = ("chief",)
+
+    def create_tasks_for_goal(self, tasks, goal):
+        list_of_task = [Task(text=task["text"]) for task in tasks]
+        list_of_task_obj = Task.objects.bulk_create(
+            list_of_task, ignore_conflicts=True
+        )
+        list_of_goaltask = [
+            GoalTask(goal_id=goal.id, tasks=task) for task in list_of_task_obj
+        ]
+        try:
+            GoalTask.objects.bulk_create(list_of_goaltask)
+        except ValueError as error:
+            print(error)
+
+    def create_goals_for_idp(self, goals, idp):
+        list_of_goal_for_ipr = []
+        for goal in goals:
+            tasks = goal.pop("tasks")
+            deadline = goal.pop("deadline")
+            new_goal, created = Goal.objects.get_or_create(**goal)
+            self.create_tasks_for_goal(tasks, new_goal)
+            list_of_goal_for_ipr.append(
+                GoalForIdp(
+                    goal_id=new_goal.pk, deadline=deadline, idp_id=idp.pk
+                )
+            )
+        GoalForIdp.objects.bulk_create(list_of_goal_for_ipr)
+
+    def create(self, validated_data):
+        goals = validated_data.pop("goals")
+        idp = Idp.objects.create(
+            **validated_data, chief=self.context["request"].user
+        )
+        self.create_goals_for_idp(goals, idp)
+        return idp
+
+    def to_representation(self, instance):
+        return IdpSerializer(
+            instance, context={"request": self.context.get("request")}
+        ).data
