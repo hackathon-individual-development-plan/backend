@@ -1,7 +1,6 @@
-from rest_framework import serializers
-
 from idps.models import Goal, GoalForIdp, GoalTask, Idp, Task
-from users.models import User, ChiefEmployee
+from rest_framework import serializers
+from users.models import ChiefEmployee, User
 
 
 class UserSerializer(serializers.ModelSerializer):

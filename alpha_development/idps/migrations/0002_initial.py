@@ -6,75 +6,123 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('idps', '0001_initial'),
+        ("idps", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='comment',
-            name='user_id',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL, verbose_name='Автор комментария'),
+            model_name="comment",
+            name="user_id",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="Автор комментария",
+            ),
         ),
         migrations.AddField(
-            model_name='comment',
-            name='goal_id',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='idps.goal', verbose_name='Цель'),
+            model_name="comment",
+            name="goal_id",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                to="idps.goal",
+                verbose_name="Цель",
+            ),
         ),
         migrations.AddField(
-            model_name='goalforidp',
-            name='goal',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='idp_goals', to='idps.goal', verbose_name='Цель'),
+            model_name="goalforidp",
+            name="goal",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="idp_goals",
+                to="idps.goal",
+                verbose_name="Цель",
+            ),
         ),
         migrations.AddField(
-            model_name='goaltask',
-            name='goal',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='idps.goal', verbose_name='Цель'),
+            model_name="goaltask",
+            name="goal",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                to="idps.goal",
+                verbose_name="Цель",
+            ),
         ),
         migrations.AddField(
-            model_name='idp',
-            name='chief',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='idp_for_employee', to=settings.AUTH_USER_MODEL, verbose_name='Руководитель'),
+            model_name="idp",
+            name="chief",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="idp_for_employee",
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="Руководитель",
+            ),
         ),
         migrations.AddField(
-            model_name='idp',
-            name='employee',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='my_idp', to=settings.AUTH_USER_MODEL, verbose_name='Сотрудник'),
+            model_name="idp",
+            name="employee",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="my_idp",
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="Сотрудник",
+            ),
         ),
         migrations.AddField(
-            model_name='idp',
-            name='goals',
-            field=models.ManyToManyField(through='idps.GoalForIdp', to='idps.goal', verbose_name='Цели'),
+            model_name="idp",
+            name="goals",
+            field=models.ManyToManyField(
+                through="idps.GoalForIdp", to="idps.goal", verbose_name="Цели"
+            ),
         ),
         migrations.AddField(
-            model_name='goalforidp',
-            name='idp',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='idp_goals', to='idps.idp', verbose_name='ИПР'),
+            model_name="goalforidp",
+            name="idp",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="idp_goals",
+                to="idps.idp",
+                verbose_name="ИПР",
+            ),
         ),
         migrations.AddField(
-            model_name='goaltask',
-            name='tasks',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='goals', to='idps.task', verbose_name='Задачи'),
+            model_name="goaltask",
+            name="tasks",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="goals",
+                to="idps.task",
+                verbose_name="Задачи",
+            ),
         ),
         migrations.AddField(
-            model_name='goal',
-            name='tasks',
-            field=models.ManyToManyField(through='idps.GoalTask', to='idps.task', verbose_name='Задачи'),
+            model_name="goal",
+            name="tasks",
+            field=models.ManyToManyField(
+                through="idps.GoalTask", to="idps.task", verbose_name="Задачи"
+            ),
         ),
         migrations.AddConstraint(
-            model_name='idp',
-            constraint=models.UniqueConstraint(fields=('title', 'chief', 'employee'), name='unique_idp_for_employee'),
+            model_name="idp",
+            constraint=models.UniqueConstraint(
+                fields=("title", "chief", "employee"),
+                name="unique_idp_for_employee",
+            ),
         ),
         migrations.AddConstraint(
-            model_name='idp',
-            constraint=models.CheckConstraint(check=models.Q(('chief', models.F('employee')), _negated=True), name='self_follow'),
+            model_name="idp",
+            constraint=models.CheckConstraint(
+                check=models.Q(("chief", models.F("employee")), _negated=True),
+                name="self_follow",
+            ),
         ),
         migrations.AddConstraint(
-            model_name='goaltask',
-            constraint=models.UniqueConstraint(fields=('goal', 'tasks'), name='unique_goal_task'),
+            model_name="goaltask",
+            constraint=models.UniqueConstraint(
+                fields=("goal", "tasks"), name="unique_goal_task"
+            ),
         ),
     ]

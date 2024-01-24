@@ -4,90 +4,234 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Comment',
+            name="Comment",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('comment_text', models.TextField(verbose_name='Текст комментария')),
-                ('created_at', models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='Дата создания')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "comment_text",
+                    models.TextField(verbose_name="Текст комментария"),
+                ),
+                (
+                    "created_at",
+                    models.DateTimeField(
+                        auto_now_add=True,
+                        db_index=True,
+                        verbose_name="Дата создания",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Комментарий',
-                'verbose_name_plural': 'Комментарии',
+                "verbose_name": "Комментарий",
+                "verbose_name_plural": "Комментарии",
             },
         ),
         migrations.CreateModel(
-            name='Goal',
+            name="Goal",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=20, verbose_name='Название Цели')),
-                ('description', models.TextField(verbose_name='Описание Цели')),
-                ('created_at', models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='Дата создания')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "title",
+                    models.CharField(
+                        max_length=20, verbose_name="Название Цели"
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(verbose_name="Описание Цели"),
+                ),
+                (
+                    "created_at",
+                    models.DateTimeField(
+                        auto_now_add=True,
+                        db_index=True,
+                        verbose_name="Дата создания",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Цель',
-                'verbose_name_plural': 'Цели',
-                'ordering': ('created_at',),
+                "verbose_name": "Цель",
+                "verbose_name_plural": "Цели",
+                "ordering": ("created_at",),
             },
         ),
         migrations.CreateModel(
-            name='GoalForIdp',
+            name="GoalForIdp",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('status', models.CharField(choices=[('In progress', 'В работе'), ('Work done', 'Выполнен'), ('Not done', 'Не выполнен'), ('Empty', 'Отсутствует')], default='In progress', max_length=11, verbose_name='Статус Цели')),
-                ('created_at', models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='Дата создания')),
-                ('deadline', models.DateTimeField(db_index=True, verbose_name='Дата дедлайна')),
-                ('finished_at', models.DateTimeField(blank=True, db_index=True, null=True, verbose_name='Дата закрытия цели')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("In progress", "В работе"),
+                            ("Work done", "Выполнен"),
+                            ("Not done", "Не выполнен"),
+                            ("Empty", "Отсутствует"),
+                        ],
+                        default="In progress",
+                        max_length=11,
+                        verbose_name="Статус Цели",
+                    ),
+                ),
+                (
+                    "created_at",
+                    models.DateTimeField(
+                        auto_now_add=True,
+                        db_index=True,
+                        verbose_name="Дата создания",
+                    ),
+                ),
+                (
+                    "deadline",
+                    models.DateTimeField(
+                        db_index=True, verbose_name="Дата дедлайна"
+                    ),
+                ),
+                (
+                    "finished_at",
+                    models.DateTimeField(
+                        blank=True,
+                        db_index=True,
+                        null=True,
+                        verbose_name="Дата закрытия цели",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Цель ИПР',
-                'verbose_name_plural': 'Цели для ИПР',
-                'ordering': ('created_at', 'idp__title', 'status', 'deadline'),
+                "verbose_name": "Цель ИПР",
+                "verbose_name_plural": "Цели для ИПР",
+                "ordering": ("created_at", "idp__title", "status", "deadline"),
             },
         ),
         migrations.CreateModel(
-            name='GoalTask',
+            name="GoalTask",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Цель-задача',
-                'verbose_name_plural': 'Цели - задачи',
+                "verbose_name": "Цель-задача",
+                "verbose_name_plural": "Цели - задачи",
             },
         ),
         migrations.CreateModel(
-            name='Idp',
+            name="Idp",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=20, verbose_name='Наименование ИПР')),
-                ('status', models.CharField(choices=[('In progress', 'В работе'), ('Work done', 'Выполнен'), ('Not done', 'Не выполнен'), ('Empty', 'Отсутствует')], default='In progress', max_length=11, verbose_name='Статус ИПР')),
-                ('created_at', models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='Дата создания')),
-                ('finished_at', models.DateTimeField(blank=True, db_index=True, null=True, verbose_name='Дата закрытия ИПР')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "title",
+                    models.CharField(
+                        max_length=20, verbose_name="Наименование ИПР"
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("In progress", "В работе"),
+                            ("Work done", "Выполнен"),
+                            ("Not done", "Не выполнен"),
+                            ("Empty", "Отсутствует"),
+                        ],
+                        default="In progress",
+                        max_length=11,
+                        verbose_name="Статус ИПР",
+                    ),
+                ),
+                (
+                    "created_at",
+                    models.DateTimeField(
+                        auto_now_add=True,
+                        db_index=True,
+                        verbose_name="Дата создания",
+                    ),
+                ),
+                (
+                    "finished_at",
+                    models.DateTimeField(
+                        blank=True,
+                        db_index=True,
+                        null=True,
+                        verbose_name="Дата закрытия ИПР",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'ИПР',
-                'verbose_name_plural': 'ИПРы',
-                'ordering': ('created_at', 'employee', 'chief', 'status'),
+                "verbose_name": "ИПР",
+                "verbose_name_plural": "ИПРы",
+                "ordering": ("created_at", "employee", "chief", "status"),
             },
         ),
         migrations.CreateModel(
-            name='Task',
+            name="Task",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('text', models.TextField(verbose_name='Задача')),
-                ('created_at', models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='Дата создания')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("text", models.TextField(verbose_name="Задача")),
+                (
+                    "created_at",
+                    models.DateTimeField(
+                        auto_now_add=True,
+                        db_index=True,
+                        verbose_name="Дата создания",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Задача',
-                'verbose_name_plural': 'Задачи',
-                'ordering': ('text', 'created_at'),
+                "verbose_name": "Задача",
+                "verbose_name_plural": "Задачи",
+                "ordering": ("text", "created_at"),
             },
         ),
     ]

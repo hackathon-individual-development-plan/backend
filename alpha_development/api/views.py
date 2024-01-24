@@ -1,19 +1,18 @@
 from django.db.models import OuterRef, Prefetch, Subquery
 from django_filters.rest_framework import DjangoFilterBackend
+from idps.models import Idp, Status
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
-
-
-from rest_framework import viewsets
+from users.models import ChiefEmployee
 
 from .filters import EmployeeWithoutIdpFilter
 from .serializers import (
-    IdpSerializer, EmployeeSerializer, EmployeeWithoutIdpSerializer
+    EmployeeSerializer,
+    EmployeeWithoutIdpSerializer,
+    IdpSerializer,
 )
-from users.models import ChiefEmployee
-from idps.models import Idp, Status
 
 
 class IdpViewSet(viewsets.ModelViewSet):
