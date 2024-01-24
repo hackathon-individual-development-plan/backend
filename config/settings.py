@@ -165,4 +165,4 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # constants
 
-FIELD_TITLE_LENGTH = 20
+FIELD_TITLE_LENGTH = 200

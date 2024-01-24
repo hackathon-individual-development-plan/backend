@@ -18,7 +18,7 @@ class GoalForIdpAdmin(admin.TabularInline):
 class TaskAdmin(admin.ModelAdmin):
     @admin.display(description="Цель")
     def goal_list(self, obj):
-        return list(goal.goal for goal in obj.goals.all())
+        return list(goal.goal for goal in obj.goals_tasks.all())
 
     list_display = ("pk", "text", "goal_list", "created_at")
     search_fields = ("text",)

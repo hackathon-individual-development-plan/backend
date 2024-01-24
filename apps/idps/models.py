@@ -68,14 +68,14 @@ class GoalTask(models.Model):
         Goal,
         on_delete=models.CASCADE,
         null=False,
-        # related_name="tasks",
+        related_name="goals_tasks",
         verbose_name="Цель",
     )
     tasks = models.ForeignKey(
         Task,
         on_delete=models.CASCADE,
         null=False,
-        related_name="goals",
+        related_name="goals_tasks",
         verbose_name="Задачи",
     )
 
