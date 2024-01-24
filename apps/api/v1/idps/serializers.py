@@ -66,12 +66,13 @@ class IdpSerializer(serializers.ModelSerializer):
     """
 
     goals = GoalForIdpSerializer(source="idp_goals", many=True, read_only=True)
+
     employee = UserSerializer(read_only=True)
-    chief = UserSerializer(read_only=True)
+    # chief = UserSerializer(read_only=True)
 
     class Meta:
         model = Idp
-        fields = ("id", "title", "goals", "employee", "chief", "status")
+        fields = ("id", "title", "status", "goals", "employee")  # "chief"
 
 
 # TODO добавить комменты
@@ -126,11 +127,14 @@ class PostIdpSerializer(serializers.ModelSerializer):
         """
         Функция удаления задач и целей при изменении ИПР
         """
+        task_for_delete = []
         for goal in goals:
             tasks = GoalTask.objects.filter(goal=goal.goal_id)
+            task_for_delete.append([task.id for task in tasks])
             Goal.objects.filter(id=goal.goal_id).delete()
-        for task in tasks:
-            Task.objects.filter(id=task.id).delete()
+        task_for_delete = sum(task_for_delete, [])
+        for id in task_for_delete:
+            Task.objects.filter(id=id).delete()
         GoalForIdp.objects.filter(idp=instance).delete()
 
     def update(self, instance, validated_data):

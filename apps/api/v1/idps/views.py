@@ -12,6 +12,6 @@ class IdpViewSet(CreateRetrieveViewSet):
     ordering_fields = ["-created_at"]
 
     def get_serializer_class(self):
-        if self.request.method in ["POST", "PATCH"]:
+        if self.request.method in ["POST", "PUT"]:
             return PostIdpSerializer
         return IdpSerializer
