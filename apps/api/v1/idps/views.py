@@ -5,9 +5,9 @@ from apps.api.v1.idps.mixinview import CreateRetrieveViewSet, CreateViewSet
 from apps.api.v1.idps.serializers import (
     GoalForIdp,
     IdpSerializer,
+    PatchIdpSerializer,
     PostCommentSerializer,
     PostIdpSerializer,
-    PutIdpSerializer,
 )
 from apps.idps.models import Comment, Idp
 
@@ -15,8 +15,8 @@ from apps.idps.models import Comment, Idp
 class IdpViewSet(CreateRetrieveViewSet):
     queryset = Idp.objects.all().prefetch_related(
         Prefetch(
-            "goals",
-            queryset=GoalForIdp.objects.prefetch_related("goal_comment"),
+            "idp_goals",
+            queryset=GoalForIdp.objects.prefetch_related("tasks"),
         )
     )
     # permission_classes = (IsChief,) TODO написать пермишн
@@ -28,9 +28,9 @@ class IdpViewSet(CreateRetrieveViewSet):
         ]:
             return PostIdpSerializer
         if self.request.method in [
-            "PUT",
+            "PATCH",
         ]:
-            return PutIdpSerializer
+            return PatchIdpSerializer
         return IdpSerializer
 
 

@@ -1,12 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group
 
-from apps.idps.models import Comment, Goal, GoalForIdp, GoalTask, Idp, Task
-
-
-class GoalTaskAdmin(admin.TabularInline):
-    model = GoalTask
-    min_num = 1
+from apps.idps.models import Comment, GoalForIdp, Idp, Task
 
 
 class GoalIdpAdmin(admin.TabularInline):
@@ -18,7 +13,7 @@ class GoalIdpAdmin(admin.TabularInline):
 class TaskAdmin(admin.ModelAdmin):
     @admin.display(description="Цель")
     def goal_list(self, obj):
-        return list(goal.goal for goal in obj.goals_tasks.all())
+        return list(goal for goal in obj.goals.all())
 
     list_display = ("pk", "text", "goal_list", "created_at")
     search_fields = ("text",)
@@ -26,28 +21,21 @@ class TaskAdmin(admin.ModelAdmin):
     empty_value_display = "-пусто-"
 
 
-@admin.register(Goal)
-class GoalAdmin(admin.ModelAdmin):
-    @admin.display(description="Задачи")
-    def tasks_list(self, obj):
-        return list(task for task in obj.tasks.all())
-
-    list_display = ("pk", "title", "description", "tasks_list", "created_at")
-    search_fields = ("title",)
-    list_filter = ("created_at", "tasks")
-    inlines = [
-        GoalTaskAdmin,
-    ]
-    empty_value_display = "-пусто-"
-
-
 @admin.register(GoalForIdp)
 class GoalForIdpAdmin(admin.ModelAdmin):
     @admin.display(description="Задачи")
     def tasks_list(self, obj):
-        return list(task for task in obj.goal.tasks.all())
+        return list(task for task in obj.tasks.all())
 
-    list_display = ("id", "goal", "status", "deadline", "idp", "tasks_list")
+    list_display = (
+        "id",
+        "title",
+        "description",
+        "status",
+        "deadline",
+        "idp",
+        "tasks_list",
+    )
     list_filter = ("idp", "deadline", "created_at")
     empty_value_display = "-пусто-"
 
@@ -56,7 +44,7 @@ class GoalForIdpAdmin(admin.ModelAdmin):
 class IdpAdmin(admin.ModelAdmin):
     @admin.display(description="Цели")
     def goal_list(self, obj):
-        return list(goal for goal in obj.goals.all())
+        return list(goal for goal in obj.idp_goals.all())
 
     list_display = (
         "pk",
