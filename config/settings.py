@@ -45,6 +45,7 @@ DJANGO_APPS = [
 LOCAL_APPS = [
     "drf_spectacular",
     "rest_framework",
+    "rest_framework.authtoken",
 ]
 
 THIRD_PARTY_APPS = ["apps.users", "apps.idps", "apps.api"]
@@ -120,6 +121,12 @@ AUTH_USER_MODEL = "users.User"
 
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",  # DEBUG: rest_framework.permissions.AllowAny
+    ],
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication",
+    ],
 }
 
 SPECTACULAR_SETTINGS = {
@@ -139,7 +146,7 @@ SPECTACULAR_SETTINGS = {
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
-LANGUAGE_CODE = "ru"
+LANGUAGE_CODE = "ru-ru"
 
 TIME_ZONE = "UTC"
 

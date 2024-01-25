@@ -7,6 +7,7 @@ from drf_spectacular.views import (
     SpectacularRedocView,
     SpectacularSwaggerView,
 )
+from rest_framework.authtoken import views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -22,6 +23,7 @@ urlpatterns = [
         SpectacularRedocView.as_view(url_name="schema"),
         name="redoc",
     ),
+    path("api-token-auth/", views.obtain_auth_token),
 ]
 
 if settings.DEBUG:
