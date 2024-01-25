@@ -9,7 +9,7 @@ class GoalTaskAdmin(admin.TabularInline):
     min_num = 1
 
 
-class GoalForIdpAdmin(admin.TabularInline):
+class GoalIdpAdmin(admin.TabularInline):
     model = GoalForIdp
     min_num = 1
 
@@ -41,6 +41,17 @@ class GoalAdmin(admin.ModelAdmin):
     empty_value_display = "-пусто-"
 
 
+@admin.register(GoalForIdp)
+class GoalForIdpAdmin(admin.ModelAdmin):
+    @admin.display(description="Задачи")
+    def tasks_list(self, obj):
+        return list(task for task in obj.goal.tasks.all())
+
+    list_display = ("id", "goal", "status", "deadline", "idp", "tasks_list")
+    list_filter = ("idp", "deadline", "created_at")
+    empty_value_display = "-пусто-"
+
+
 @admin.register(Idp)
 class IdpAdmin(admin.ModelAdmin):
     @admin.display(description="Цели")
@@ -59,7 +70,7 @@ class IdpAdmin(admin.ModelAdmin):
     search_fields = ("title", "chief", "employee", "status")
     list_filter = ("created_at", "chief", "employee", "status")
     inlines = [
-        GoalForIdpAdmin,
+        GoalIdpAdmin,
     ]
     empty_value_display = "-пусто-"
 
@@ -69,12 +80,12 @@ class CommentAdmin(admin.ModelAdmin):
     list_display = (
         "pk",
         "comment_text",
-        "goal_id",
-        "user_id",
+        "goal",
+        "user",
         "created_at",
     )
-    search_fields = ("goal_id", "user_id", "created_at")
-    list_filter = ("goal_id", "user_id", "created_at")
+    search_fields = ("goal", "user", "created_at")
+    list_filter = ("goal", "user", "created_at")
     empty_value_display = "-пусто-"
 
 

@@ -32,7 +32,7 @@ class Task(models.Model):
         )
 
     def __str__(self):
-        return self.text
+        return f"id {self.id}-{self.text}"
 
 
 class Goal(models.Model):
@@ -58,7 +58,7 @@ class Goal(models.Model):
         ordering = ("created_at",)
 
     def __str__(self):
-        return self.title
+        return f"id {self.id}-{self.title}"
 
 
 class GoalTask(models.Model):
@@ -141,10 +141,7 @@ class Idp(CommonCleanMixin, models.Model):
         ordering = ("created_at", "employee", "chief", "status")
 
     def __str__(self):
-        return (
-            f"ИПР:{self.title},\n Создатель:{self.chief}, \n"
-            f"Исполнитель:{self.employee}, \n Статус:{self.status}"
-        )
+        return f"id {self.id}"
 
     def clean(self):
         super().clean()
@@ -203,15 +200,19 @@ class Comment(models.Model):
     """Модель комментариев к целям."""
 
     comment_text = models.TextField(verbose_name="Текст комментария")
-    goal_id = models.ForeignKey(
-        Goal,
+    goal = models.ForeignKey(
+        GoalForIdp,
         blank=False,
         null=False,
         on_delete=models.CASCADE,
+        related_name="goal_comment",
         verbose_name="Цель",
     )
-    user_id = models.ForeignKey(
-        User, on_delete=models.CASCADE, verbose_name="Автор комментария"
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="user_comments",
+        verbose_name="Автор комментария",
     )
     created_at = models.DateTimeField(
         verbose_name="Дата создания", auto_now_add=True, db_index=True
@@ -222,4 +223,4 @@ class Comment(models.Model):
         verbose_name_plural = "Комментарии"
 
     def __str__(self):
-        return f"Комментарий пользователя: {self.user_id.get_full_name()}"
+        return f"Комментарий пользователя: {self.user.get_full_name()}"

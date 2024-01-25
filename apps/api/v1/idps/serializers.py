@@ -1,8 +1,11 @@
 from django.core.exceptions import ValidationError
 from rest_framework import serializers
 
-from apps.api.v1.users.serializers.users import UserSerializer
-from apps.idps.models import Goal, GoalForIdp, GoalTask, Idp, Task
+from apps.api.v1.users.serializers.users import (
+    UserFIOSerializer,
+    UserSerializer,
+)
+from apps.idps.models import Comment, Goal, GoalForIdp, GoalTask, Idp, Task
 from apps.users.models import User
 
 
@@ -30,11 +33,34 @@ class GoalTaskSerializer(serializers.ModelSerializer):
         fields = ("text",)
 
 
+class CommentSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для комментов, используется в
+    сериализаторе IdpSerializer
+    """
+
+    user = UserFIOSerializer(read_only=True)
+
+    class Meta:
+        model = Comment
+        fields = ["user", "comment_text", "created_at"]
+
+
+class PostCommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ("comment_text",)
+        read_only_fields = ("author", "user")
+
+
 class GoalForIdpSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField(source="goal.id")
     title = serializers.ReadOnlyField(source="goal.title")
     description = serializers.ReadOnlyField(source="goal.description")
     tasks = serializers.SerializerMethodField()
+    comments = CommentSerializer(
+        source="goal_comment", many=True, read_only=True
+    )
 
     def get_tasks(self, obj):
         return GoalTaskSerializer(
@@ -43,7 +69,15 @@ class GoalForIdpSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = GoalForIdp
-        fields = ("id", "title", "deadline", "status", "description", "tasks")
+        fields = (
+            "id",
+            "title",
+            "deadline",
+            "status",
+            "description",
+            "tasks",
+            "comments",
+        )
 
 
 class PostGoalForIdpSerializer(serializers.ModelSerializer):
@@ -68,6 +102,7 @@ class IdpSerializer(serializers.ModelSerializer):
     goals = GoalForIdpSerializer(source="idp_goals", many=True, read_only=True)
 
     employee = UserSerializer(read_only=True)
+
     # chief = UserSerializer(read_only=True)
 
     class Meta:
@@ -76,6 +111,24 @@ class IdpSerializer(serializers.ModelSerializer):
 
 
 # TODO добавить комменты
+
+
+def create_goals_for_idp(goals, idp):
+    """
+    Функция создания целей для ИПР в БД
+    """
+    list_of_goal_for_ipr = []
+    for goal in goals:
+        tasks = goal.pop("tasks")
+        list_of_task = [Task(text=task["text"]) for task in tasks]
+        list_of_task_obj = Task.objects.bulk_create(list_of_task)
+        deadline = goal.pop("deadline")
+        goal_obj, created = Goal.objects.get_or_create(**goal)
+        goal_obj.tasks.set(list_of_task_obj)
+        list_of_goal_for_ipr.append(
+            GoalForIdp(goal_id=goal_obj.pk, deadline=deadline, idp_id=idp.pk)
+        )
+    GoalForIdp.objects.bulk_create(list_of_goal_for_ipr)
 
 
 class PostIdpSerializer(serializers.ModelSerializer):
@@ -93,25 +146,6 @@ class PostIdpSerializer(serializers.ModelSerializer):
         fields = ("title", "goals", "employee", "chief")
         read_only_fields = ("chief",)
 
-    def create_goals_for_idp(self, goals, idp):
-        """
-        Функция создания целей для ИПР в БД
-        """
-        list_of_goal_for_ipr = []
-        for goal in goals:
-            tasks = goal.pop("tasks")
-            list_of_task = [Task(text=task["text"]) for task in tasks]
-            list_of_task_obj = Task.objects.bulk_create(list_of_task)
-            deadline = goal.pop("deadline")
-            goal_obj, created = Goal.objects.get_or_create(**goal)
-            goal_obj.tasks.set(list_of_task_obj)
-            list_of_goal_for_ipr.append(
-                GoalForIdp(
-                    goal_id=goal_obj.pk, deadline=deadline, idp_id=idp.pk
-                )
-            )
-        GoalForIdp.objects.bulk_create(list_of_goal_for_ipr)
-
     def create(self, validated_data):
         """
         Функция создания ИПР в БД
@@ -120,12 +154,33 @@ class PostIdpSerializer(serializers.ModelSerializer):
         idp = Idp.objects.create(
             **validated_data, chief=self.context["request"].user
         )
-        self.create_goals_for_idp(goals, idp)
+        create_goals_for_idp(goals, idp)
         return idp
+
+    def to_representation(self, instance):
+        return IdpSerializer(
+            instance, context={"request": self.context.get("request")}
+        ).data
+
+
+class PutIdpSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для изменения ИПР. PUT запрос
+    """
+
+    goals = PostGoalForIdpSerializer(many=True)
+
+    class Meta:
+        model = Idp
+        fields = (
+            "title",
+            "goals",
+            "status",
+        )
 
     def delete_goals_tasks_of_idp(self, goals, instance):
         """
-        Функция удаления задач и целей при изменении ИПР
+        Функция удаления задач и целей при изменении ИПР. PUT запрос.
         """
         task_for_delete = []
         for goal in goals:
@@ -135,11 +190,10 @@ class PostIdpSerializer(serializers.ModelSerializer):
         task_for_delete = sum(task_for_delete, [])
         for id in task_for_delete:
             Task.objects.filter(id=id).delete()
-        GoalForIdp.objects.filter(idp=instance).delete()
 
     def update(self, instance, validated_data):
         """
-        Функция для Patch запроса
+        Функция для Put запроса
         """
         if instance.chief != self.context["request"].user:
             raise ValidationError("Исправлять может только автор")
@@ -147,7 +201,7 @@ class PostIdpSerializer(serializers.ModelSerializer):
         goals = GoalForIdp.objects.filter(idp=instance)
         self.delete_goals_tasks_of_idp(goals, instance)
         new_goals = validated_data.pop("goals")
-        self.create_goals_for_idp(new_goals, instance)
+        create_goals_for_idp(new_goals, instance)
         return super().update(instance, validated_data)
 
     def to_representation(self, instance):
