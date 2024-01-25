@@ -15,26 +15,6 @@ class Status(models.TextChoices):
     EMPTY = ("Empty", "Отсутствует")
 
 
-class Task(models.Model):
-    """Модель задачи"""
-
-    text = models.TextField(verbose_name="Задача")
-    created_at = models.DateTimeField(
-        verbose_name="Дата создания", auto_now_add=True, db_index=True
-    )
-
-    class Meta:
-        verbose_name = "Задача"
-        verbose_name_plural = "Задачи"
-        ordering = (
-            "text",
-            "created_at",
-        )
-
-    def __str__(self):
-        return f"id {self.id}-{self.text}"
-
-
 class Idp(CommonCleanMixin, models.Model):
     title = models.CharField(
         max_length=settings.FIELD_TITLE_LENGTH, verbose_name="Наименование ИПР"
@@ -109,9 +89,9 @@ class GoalForIdp(models.Model):
     deadline = models.DateTimeField(
         verbose_name="Дата дедлайна", db_index=True
     )
-    tasks = models.ManyToManyField(
-        Task, related_name="goals", verbose_name="Задачи"
-    )
+    # tasks = models.ManyToManyField(
+    #     Task, related_name="goals", verbose_name="Задачи"
+    # )
     idp = models.ForeignKey(
         Idp,
         on_delete=models.CASCADE,
@@ -129,6 +109,32 @@ class GoalForIdp(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Task(models.Model):
+    """Модель задачи"""
+
+    text = models.TextField(verbose_name="Задача")
+    goal = models.ForeignKey(
+        GoalForIdp,
+        on_delete=models.CASCADE,
+        related_name="goals_tasks",
+        verbose_name="Цели",
+    )
+    created_at = models.DateTimeField(
+        verbose_name="Дата создания", auto_now_add=True, db_index=True
+    )
+
+    class Meta:
+        verbose_name = "Задача"
+        verbose_name_plural = "Задачи"
+        ordering = (
+            "text",
+            "created_at",
+        )
+
+    def __str__(self):
+        return f"id {self.id}-{self.text}"
 
 
 class Comment(models.Model):
