@@ -12,7 +12,6 @@ class Status(models.TextChoices):
     IN_PROGRESS = ("In progress", "В работе")
     WORK_DONE = ("Work done", "Выполнен")
     NOT_DONE = ("Not done", "Не выполнен")
-    EMPTY = ("Empty", "Отсутствует")
 
 
 class Idp(CommonCleanMixin, models.Model):
