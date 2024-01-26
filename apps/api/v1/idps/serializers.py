@@ -42,7 +42,7 @@ class PostCommentSerializer(serializers.ModelSerializer):
 
 
 class TaskSerializer(serializers.ModelSerializer):
-    """Сериализатор просмотра и редактирования задач.
+    """Сериализатор для просмотра и редактирования задач.
     id - опционально.
     """
 
@@ -142,13 +142,13 @@ class PostIdpSerializer(serializers.ModelSerializer):
     """
 
     goals = PostGoalSerializer(many=True)
-    employee = serializers.SlugRelatedField(
+    employee_id = serializers.SlugRelatedField(
         queryset=User.objects.all(), slug_field="id"
     )
 
     class Meta:
         model = Idp
-        fields = ("title", "goals", "employee", "chief")
+        fields = ("title", "goals", "employee_id", "chief")
         read_only_fields = ("chief",)
 
     def create_goals_for_idp(self, goals, idp):
