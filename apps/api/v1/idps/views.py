@@ -1,5 +1,7 @@
 from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
+from drf_spectacular.utils import extend_schema
+from rest_framework import status
 from rest_framework.response import Response
 
 from apps.api.v1.idps.mixinview import CreateRetrieveViewSet, CreateViewSet
@@ -47,6 +49,10 @@ class IdpViewSet(CreateRetrieveViewSet):
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
         return Response(serializer.data)
+
+    @extend_schema(exclude=True)
+    def partial_update(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 class CommentViewSet(CreateViewSet):

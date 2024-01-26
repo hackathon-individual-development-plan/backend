@@ -10,7 +10,7 @@ from apps.users.models import User
 
 
 class IdpForEmployeesSerializer(serializers.ModelSerializer):
-    """Сериализатор для получения данных об ИПР.
+    """Сериализатор для просмотра данных об ИПР.
     Используется в сериализаторе EmployeeSerializer.
     """
 
@@ -29,7 +29,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = ["user", "comment_text", "created_at"]
+        fields = ["id", "user", "comment_text", "created_at"]
 
 
 class PostCommentSerializer(serializers.ModelSerializer):
@@ -54,6 +54,14 @@ class TaskSerializer(serializers.ModelSerializer):
             "id",
             "text",
         )
+
+
+class PostTaskSerializer(serializers.ModelSerializer):
+    """Сериализатор для создания задач."""
+
+    class Meta:
+        model = Task
+        fields = ("text",)
 
 
 class GoalSerializer(serializers.ModelSerializer):
@@ -82,7 +90,7 @@ class PostGoalSerializer(serializers.ModelSerializer):
     Сериализатор для создания целей ИПР.
     """
 
-    tasks = TaskSerializer(many=True)
+    tasks = PostTaskSerializer(many=True)
 
     class Meta:
         model = Goal
@@ -105,7 +113,7 @@ class PutGoalSerializer(serializers.ModelSerializer):
 
 class IdpSerializer(serializers.ModelSerializer):
     """
-    Сериализатор для просмотра ИПР.
+    Сериализатор для просмотра ИПР руководителем.
     """
 
     goals = GoalSerializer(source="idp_goals", many=True, read_only=True)
@@ -114,6 +122,18 @@ class IdpSerializer(serializers.ModelSerializer):
     class Meta:
         model = Idp
         fields = ("id", "title", "status", "goals", "employee")
+
+
+class MyIdpSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для просмотра ИПР сотрудником.
+    """
+
+    goals = GoalSerializer(source="idp_goals", many=True, read_only=True)
+
+    class Meta:
+        model = Idp
+        fields = ("id", "title", "status", "goals")
 
 
 class PostIdpSerializer(serializers.ModelSerializer):
