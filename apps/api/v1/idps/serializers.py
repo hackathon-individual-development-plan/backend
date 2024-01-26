@@ -143,13 +143,13 @@ class PostIdpSerializer(serializers.ModelSerializer):
     """
 
     goals = PostGoalSerializer(many=True)
-    employee_id = serializers.SlugRelatedField(
+    employee = serializers.SlugRelatedField(
         queryset=User.objects.all(), slug_field="id"
     )
 
     class Meta:
         model = Idp
-        fields = ("title", "goals", "employee_id", "chief")
+        fields = ("title", "goals", "employee", "chief")
         read_only_fields = ("chief",)
 
     def create_goals_for_idp(self, goals, idp):
@@ -231,6 +231,11 @@ class PutIdpSerializer(serializers.ModelSerializer):
                 goal_instance = goal_serializer.save(idp=instance)
 
                 # Создание задач для новой цели
+                def drop(dictionary, dictionary_key):
+                    dictionary.pop(dictionary_key)
+                    return dictionary
+
+                tasks_data = [drop(task, "id") for task in tasks_data]
                 self.update_or_create_tasks(goal_instance, tasks_data)
 
         return instance
