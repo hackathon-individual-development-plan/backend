@@ -16,6 +16,8 @@ class Status(models.TextChoices):
 
 
 class Idp(CommonCleanMixin, models.Model):
+    """Модель ИПР (индивидуального плана развития)."""
+
     title = models.CharField(
         max_length=settings.FIELD_TITLE_LENGTH, verbose_name="Наименование ИПР"
     )
@@ -70,8 +72,8 @@ class Idp(CommonCleanMixin, models.Model):
             raise ValidationError("Возможно это не ваш сотрудник?")
 
 
-class GoalForIdp(models.Model):
-    """Модель цели со статусом для конкретного ИПР"""
+class Goal(models.Model):
+    """Модель цели."""
 
     title = models.CharField(
         max_length=settings.FIELD_TITLE_LENGTH, verbose_name="Название Цели"
@@ -89,9 +91,6 @@ class GoalForIdp(models.Model):
     deadline = models.DateTimeField(
         verbose_name="Дата дедлайна", db_index=True
     )
-    # tasks = models.ManyToManyField(
-    #     Task, related_name="goals", verbose_name="Задачи"
-    # )
     idp = models.ForeignKey(
         Idp,
         on_delete=models.CASCADE,
@@ -112,11 +111,11 @@ class GoalForIdp(models.Model):
 
 
 class Task(models.Model):
-    """Модель задачи"""
+    """Модель задачи."""
 
     text = models.TextField(verbose_name="Задача")
     goal = models.ForeignKey(
-        GoalForIdp,
+        Goal,
         on_delete=models.CASCADE,
         related_name="goals_tasks",
         verbose_name="Цели",
@@ -138,11 +137,11 @@ class Task(models.Model):
 
 
 class Comment(models.Model):
-    """Модель комментариев к целям."""
+    """Модель комментария."""
 
     comment_text = models.TextField(verbose_name="Текст комментария")
     goal = models.ForeignKey(
-        GoalForIdp,
+        Goal,
         blank=False,
         null=False,
         on_delete=models.CASCADE,
@@ -165,61 +164,3 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"Комментарий пользователя: {self.user.get_full_name()}"
-
-
-# class Goal(models.Model):
-#     """Модель цели"""
-#
-#     title = models.CharField(
-#         max_length=settings.FIELD_TITLE_LENGTH, verbose_name="Название Цели"
-#     )
-#     description = models.TextField(verbose_name="Описание Цели")
-#     tasks = models.ManyToManyField(
-#         Task,
-#         blank=False,
-#         through="GoalTask",
-#         verbose_name="Задачи",
-#     )
-#     created_at = models.DateTimeField(
-#         verbose_name="Дата создания", auto_now_add=True, db_index=True
-#     )
-#
-#     class Meta:
-#         verbose_name = "Цель"
-#         verbose_name_plural = "Цели"
-#         ordering = ("created_at",)
-#
-#     def __str__(self):
-#         return f"id {self.id}-{self.title}"
-#
-#
-# class GoalTask(models.Model):
-#     """Модель для связи целей с задачами"""
-#
-#     goal = models.ForeignKey(
-#         Goal,
-#         on_delete=models.CASCADE,
-#         null=False,
-#         related_name="goals_tasks",
-#         verbose_name="Цель",
-#     )
-#     tasks = models.ForeignKey(
-#         Task,
-#         on_delete=models.CASCADE,
-#         null=False,
-#         related_name="goals_tasks",
-#         verbose_name="Задачи",
-#     )
-#
-#     def __repr__(self):
-#         return f"Goal_id: {self.goal.pk}" f"Task_id: {self.tasks.id}"
-#
-#     class Meta:
-#         constraints = [
-#             UniqueConstraint(fields=["goal", "tasks"], name="unique_goal_task")
-#         ]
-#         verbose_name = "Цель-задача"
-#         verbose_name_plural = "Цели - задачи"
-#
-#     def __str__(self):
-#         return f"Цель {self.goal.title} включает задачу {self.tasks.text}"

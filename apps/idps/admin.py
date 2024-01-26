@@ -1,12 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group
 
-from apps.idps.models import Comment, GoalForIdp, Idp, Task
-
-
-class GoalIdpAdmin(admin.TabularInline):
-    model = GoalForIdp
-    min_num = 1
+from apps.idps.models import Comment, Goal, Idp, Task
 
 
 @admin.register(Task)
@@ -21,8 +16,8 @@ class TaskAdmin(admin.ModelAdmin):
     empty_value_display = "-пусто-"
 
 
-@admin.register(GoalForIdp)
-class GoalForIdpAdmin(admin.ModelAdmin):
+@admin.register(Goal)
+class GoalAdmin(admin.ModelAdmin):
     @admin.display(description="Задачи")
     def tasks_list(self, obj):
         return list(task for task in obj.tasks.all())
@@ -57,9 +52,6 @@ class IdpAdmin(admin.ModelAdmin):
     )
     search_fields = ("title", "chief", "employee", "status")
     list_filter = ("created_at", "chief", "employee", "status")
-    inlines = [
-        GoalIdpAdmin,
-    ]
     empty_value_display = "-пусто-"
 
 
