@@ -36,20 +36,6 @@ class IdpViewSet(CreateRetrieveViewSet):
         )
         return queryset
 
-    def create(self, request, pk=None):
-        queryset = self.get_queryset()
-        instance = get_object_or_404(queryset, id=pk)
-        serializer_class = self.get_serializer_class()
-        serializer = serializer_class(instance)
-        return Response(serializer.data)
-
-    def update(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-        return Response(serializer.data)
-
     @extend_schema(exclude=True)
     def partial_update(self, request, *args, **kwargs):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
