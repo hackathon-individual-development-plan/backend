@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
@@ -192,6 +193,9 @@ class PutIdpSerializer(serializers.ModelSerializer):
         )
 
     def update(self, instance, validated_data):
+        if instance.chief != self.context["request"].user:
+            raise ValidationError("Исправлять может только автор")
+
         goals_data = validated_data["idp_goals"]
         goals_ids = [
             goal_data.get("id", None)
@@ -260,3 +264,8 @@ class PutIdpSerializer(serializers.ModelSerializer):
                 task_serializer = TaskSerializer(data=task_data)
                 task_serializer.is_valid(raise_exception=True)
                 task_serializer.save(goal=goal_instance)
+
+    def to_representation(self, instance):
+        return IdpSerializer(
+            instance, context={"request": self.context.get("request")}
+        ).data
