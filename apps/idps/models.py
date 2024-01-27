@@ -61,7 +61,7 @@ class Idp(CommonCleanMixin, models.Model):
         ordering = ("created_at", "employee", "chief", "status")
 
     def __str__(self):
-        return f"id {self.id}"
+        return self.title
 
     def clean(self):
         super().clean()
