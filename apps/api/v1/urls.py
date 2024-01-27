@@ -1,7 +1,7 @@
 from django.urls import include, path
 from rest_framework import routers
 
-from .idps.views import IdpViewSet
+from .idps.views import CommentViewSet, IdpViewSet
 from .users.views import (
     EmployeeIdpViewSet,
     EmployeeViewSet,
@@ -22,7 +22,11 @@ router.register(
     EmployeeIdpViewSet,
     basename="employee",
 )
+router.register(
+    r"idps/(?P<idp_id>\d+)/goals/(?P<goal_id>\d+)/comments",
+    CommentViewSet,
+    basename="comments",
+)
 router.register("idps", IdpViewSet, basename="idps")
-
 
 urlpatterns = [path("", include(router.urls))]
