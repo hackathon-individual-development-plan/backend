@@ -231,11 +231,6 @@ class PutIdpSerializer(serializers.ModelSerializer):
                 goal_instance = goal_serializer.save(idp=instance)
 
                 # Создание задач для новой цели
-                def drop(dictionary, dictionary_key):
-                    dictionary.pop(dictionary_key)
-                    return dictionary
-
-                tasks_data = [drop(task, "id") for task in tasks_data]
                 self.update_or_create_tasks(goal_instance, tasks_data)
 
         return instance

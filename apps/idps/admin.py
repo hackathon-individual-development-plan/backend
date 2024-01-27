@@ -6,11 +6,7 @@ from apps.idps.models import Comment, Goal, Idp, Task
 
 @admin.register(Task)
 class TaskAdmin(admin.ModelAdmin):
-    @admin.display(description="Цель")
-    def goal_list(self, obj):
-        return list(goal for goal in obj.goals.all())
-
-    list_display = ("pk", "text", "goal_list", "created_at")
+    list_display = ("pk", "text", "created_at")
     search_fields = ("text",)
     list_filter = ("created_at",)
     empty_value_display = "-пусто-"
@@ -18,10 +14,6 @@ class TaskAdmin(admin.ModelAdmin):
 
 @admin.register(Goal)
 class GoalAdmin(admin.ModelAdmin):
-    @admin.display(description="Задачи")
-    def tasks_list(self, obj):
-        return list(task for task in obj.tasks.all())
-
     list_display = (
         "id",
         "title",
@@ -29,7 +21,6 @@ class GoalAdmin(admin.ModelAdmin):
         "status",
         "deadline",
         "idp",
-        "tasks_list",
     )
     list_filter = ("idp", "deadline", "created_at")
     empty_value_display = "-пусто-"
@@ -37,16 +28,11 @@ class GoalAdmin(admin.ModelAdmin):
 
 @admin.register(Idp)
 class IdpAdmin(admin.ModelAdmin):
-    @admin.display(description="Цели")
-    def goal_list(self, obj):
-        return list(goal for goal in obj.idp_goals.all())
-
     list_display = (
         "pk",
         "title",
         "chief",
         "employee",
-        "goal_list",
         "status",
         "created_at",
     )
