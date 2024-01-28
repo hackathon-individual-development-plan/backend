@@ -3,7 +3,7 @@ name: Build and deploy to stage server
 on:
   push:
     branches:
-      - feature/nginx-compose
+      - main
 
 env:
   REGISTRY: ghcr.io
@@ -79,7 +79,7 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             cd ${{ env.DEPLOY_PATH }}
-            mv nginx/templates/default.conf.prod.template nginx/templates/default.conf.template
+            mv infra/nginx/templates/default.conf.prod.template infra/nginx/templates/default.conf.template
 
             rm -f infra/.env.compose
             touch infra/.env
