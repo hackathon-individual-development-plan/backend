@@ -1,7 +1,7 @@
 from rest_framework.permissions import SAFE_METHODS, BasePermission
 
 
-class IsOwnerOrReadOnly(BasePermission):
+class IsAuthorOrReadOnly(BasePermission):
     """Выдает права создавать и редактировать ИПР."""
 
     def has_object_permission(self, request, view, obj):

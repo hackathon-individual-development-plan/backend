@@ -9,7 +9,6 @@ from apps.idps.models import Idp, Status
 from apps.users.models import ChiefEmployee
 
 from .filters import EmployeeWithoutIdpFilter
-from .permissions import IsOwnerOrReadOnly, ReadOnly
 from .serializers.employees import (
     EmployeeSerializer,
     EmployeeWithoutIdpSerializer,
@@ -23,7 +22,6 @@ class EmployeeViewSet(viewsets.GenericViewSet):
     """
 
     serializer_class = EmployeeSerializer
-    permission_classes = (IsOwnerOrReadOnly,)
 
     latest_idp = (
         Idp.objects.filter(employee_id=OuterRef("employee_id"))
@@ -61,7 +59,6 @@ class EmployeeWithoutIdpViewSet(viewsets.GenericViewSet):
     serializer_class = EmployeeWithoutIdpSerializer
     filter_backends = (DjangoFilterBackend, SearchFilter)
     filterset_class = EmployeeWithoutIdpFilter
-    permission_classes = (IsOwnerOrReadOnly,)
 
     employees_with_idp = Idp.objects.filter(
         status=Status.IN_PROGRESS
@@ -93,7 +90,6 @@ class EmployeeIdpViewSet(viewsets.GenericViewSet):
     # после мержа ИПР сериализатора
     # заменить на serializer_class = EmployeeMyIdpSerializer
     serializer_class = EmployeeSerializer
-    permission_classes = (ReadOnly,)
 
     latest_idp = (
         Idp.objects.filter(employee_id=OuterRef("employee_id"))
