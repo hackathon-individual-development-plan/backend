@@ -16,41 +16,41 @@ defaults:
     working-directory: .
 
 jobs:
-  # buld_and_push_image_to_github_packages:
-  #   name: Build and push image to GitHub Packages
-  #   runs-on: ubuntu-latest
-  #   permissions:
-  #     contents: read
-  #     packages: write
-  #   environment:
-  #     name: Stage
+  buld_and_push_image_to_github_packages:
+    name: Build and push image to GitHub Packages
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    environment:
+      name: Stage
 
-  #   steps:
-  #     -
-  #       name: Check out the repo
-  #       uses: actions/checkout@v4
-  #     -
-  #       name: Login to GutHub Container Registry
-  #       uses: docker/login-action@v3
-  #       with:
-  #         registry: ${{ env.REGISTRY }}
-  #         username: ${{ github.actor }}
-  #         password: ${{ secrets.GITHUB_TOKEN }}
-  #     -
-  #       name: Build and push image
-  #       uses: docker/build-push-action@v5
-  #       with:
-  #         context: .
-  #         file: Dockerfile
-  #         labels: runnumber=${GITHUB_RUN_ID}
-  #         push: true
-  #         tags: |
-  #           ${{ env.REGISTRY }}/${{ env.REP_OWNER }}/${{ env.IMAGE_NAME }}:latest
+    steps:
+      -
+        name: Check out the repo
+        uses: actions/checkout@v4
+      -
+        name: Login to GutHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      -
+        name: Build and push image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile
+          labels: runnumber=${GITHUB_RUN_ID}
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.REP_OWNER }}/${{ env.IMAGE_NAME }}:latest
 
   deploy:
     name: Deploy and start the App
     runs-on: ubuntu-latest
-#    needs: buld_and_push_image_to_github_packages
+    needs: buld_and_push_image_to_github_packages
     environment:
       name: Stage
 
