@@ -107,4 +107,5 @@ jobs:
             docker pull  ${{ env.REGISTRY }}/${{ env.REP_OWNER }}/${{ env.IMAGE_NAME }}:latest
             docker compose --file infra/docker-compose.prod.yaml stop
             docker compose --file infra/docker-compose.prod.yaml rm backend
+            sleep 30
             docker compose --file infra/docker-compose.prod.yaml up -d
