@@ -33,6 +33,7 @@ services:
       - .env.compose
     volumes:
       - backend_static:/app/static/
+      - backend_media:/app/media/
     depends_on:
       - hackathon-db
 
@@ -54,6 +55,7 @@ services:
     volumes:
       - ./nginx/templates:/etc/nginx/templates
       - backend_static:/var/html/static
+      - backend_media:/var/html/media
       - frontend_static:/var/html/frontend
     depends_on:
       - backend
@@ -62,4 +64,5 @@ services:
 volumes:
   db_data:
   backend_static:
+  backend_media:
   frontend_static:
