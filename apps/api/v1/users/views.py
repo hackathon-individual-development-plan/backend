@@ -14,6 +14,20 @@ from .serializers.employees import (
     EmployeeSerializer,
     EmployeeWithoutIdpSerializer,
 )
+from .serializers.users import UserInfoSerializer
+
+
+class UserInfoViewSet(viewsets.GenericViewSet):
+    """Вьюсет используется для получения информации, включая роль, о
+    текущем пользователе.
+    """
+
+    serializer_class = UserInfoSerializer
+
+    @action(methods=["get"], detail=False)
+    def current_user(self, request, *args, **kwargs):
+        serializer = self.get_serializer(request.user)
+        return Response(serializer.data)
 
 
 class EmployeeViewSet(viewsets.GenericViewSet):
@@ -94,6 +108,6 @@ class EmployeeIdpViewSet(viewsets.GenericViewSet):
 
     @action(detail=False, methods=["get"], url_path="my-idp")
     def get_my_idp(self, request):
-        instance = self.queryset.get()
+        instance = self.get_queryset().get()
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
