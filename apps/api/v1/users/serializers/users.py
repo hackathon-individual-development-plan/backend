@@ -36,4 +36,4 @@ class UserFIOSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id", "fio"]
+        fields = ["id", "fio", "photo"]

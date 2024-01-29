@@ -31,6 +31,7 @@ class CommentSerializer(serializers.ModelSerializer):
     Используется в сериализаторе IdpSerializer.
     """
 
+    created_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M")
     user = UserFIOSerializer(read_only=True)
 
     class Meta:
@@ -73,6 +74,7 @@ class PostTaskSerializer(serializers.ModelSerializer):
 class GoalSerializer(serializers.ModelSerializer):
     """Сериализатор для получения данных о целях ИПР."""
 
+    deadline = serializers.DateTimeField(format="%Y-%m-%d")
     tasks = TaskSerializer(source="goals_tasks", many=True, read_only=True)
     comments = CommentSerializer(
         source="goal_comment", many=True, read_only=True
@@ -289,8 +291,10 @@ class PutIdpSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         errors = []
-        if not data.get("goals"):
+        if not data.get("idp_goals"):
             errors.append("Должна быть как минимум одна цель")
+        if not data.get("idp_goals__goals_tasks"):
+            errors.append("Должна быть как минимум одна задача")
         if Idp.objects.filter(
             chief=self.context["request"].user,
             employee=data.get("employee"),
