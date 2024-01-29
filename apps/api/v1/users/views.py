@@ -24,7 +24,7 @@ class UserInfoViewSet(viewsets.GenericViewSet):
 
     serializer_class = UserInfoSerializer
 
-    @action(methods=["get"], detail=False)
+    @action(methods=["get"], detail=False, url_path="current-user")
     def current_user(self, request, *args, **kwargs):
         serializer = self.get_serializer(request.user)
         return Response(serializer.data)
