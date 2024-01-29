@@ -20,7 +20,7 @@ router.register(
     basename="employees-without-idp",
 )
 router.register(
-    "employee",
+    "employee/my-idp",
     EmployeeIdpViewSet,
     basename="employee",
 )

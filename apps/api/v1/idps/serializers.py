@@ -6,13 +6,13 @@ from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
-from apps.api.v1.idps.validators import deadline_validator
 from apps.api.v1.users.serializers.users import (
     UserFIOSerializer,
     UserSerializer,
 )
+from apps.api.v1.validators import deadline_validator
 from apps.idps.models import Comment, Goal, Idp, Task
-from apps.users.models import User, UserRole
+from apps.users.models import User
 
 
 class IdpForEmployeesSerializer(serializers.ModelSerializer):
@@ -187,13 +187,16 @@ class PostIdpSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         errors = []
-        if not UserRole.objects.filter(
-            user=self.context["request"].user, role="chief"
-        ):
-            errors.append("Создать ИПР может только руководитель")
-
+        if not data.get("goals"):
+            errors.append("Должна быть как минимум одна цель")
         if self.context["request"].user == data.get("employee"):
             errors.append("Создать ИПР себе нельзя!")
+        if Idp.objects.filter(
+            chief=self.context["request"].user,
+            employee=data.get("employee"),
+            title=data.get("title"),
+        ):
+            errors.append("У этого сотрудника уже есть ИПР с таким названием")
         if errors:
             raise ValidationError(errors)
         return data
@@ -283,6 +286,20 @@ class PutIdpSerializer(serializers.ModelSerializer):
                 task_serializer = TaskSerializer(data=task_data)
                 task_serializer.is_valid(raise_exception=True)
                 task_serializer.save(goal=goal_instance)
+
+    def validate(self, data):
+        errors = []
+        if not data.get("goals"):
+            errors.append("Должна быть как минимум одна цель")
+        if Idp.objects.filter(
+            chief=self.context["request"].user,
+            employee=data.get("employee"),
+            title=data.get("title"),
+        ):
+            errors.append("У этого сотрудника уже есть ИПР с таким названием")
+        if errors:
+            raise ValidationError(errors)
+        return data
 
     def to_representation(self, instance):
         return IdpSerializer(

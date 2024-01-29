@@ -2,22 +2,24 @@ from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from apps.api.v1.idps.mixinview import CreateRetrieveViewSet, CreateViewSet
 from apps.api.v1.idps.serializers import (
     IdpSerializer,
     PostCommentSerializer,
     PostIdpSerializer,
     PutIdpSerializer,
 )
+from apps.api.v1.mixins import CreateRetrieveViewSet, CreateViewSet
+from apps.api.v1.permissions import IsChiefOrReadOnly
 from apps.idps.models import Comment, Goal, Idp
 
 
 class IdpViewSet(CreateRetrieveViewSet):
     """Вьюсет для просмотра ИПР, создания и редактирования."""
 
-    # permission_classes = (IsChief,) TODO написать пермишн
+    permission_classes = (IsChiefOrReadOnly,)
     ordering_fields = ["-created_at"]
 
     def get_serializer_class(self):
@@ -44,7 +46,7 @@ class IdpViewSet(CreateRetrieveViewSet):
 class CommentViewSet(CreateViewSet):
     """Вьюсет для просмотра и создания комментариев."""
 
-    # permission_classes=[IsAuthenticated]
+    permission_classes = (IsAuthenticated,)
     serializer_class = PostCommentSerializer
     queryset = Comment.objects.all()
 
