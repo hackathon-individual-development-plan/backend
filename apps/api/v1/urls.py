@@ -6,11 +6,13 @@ from .users.views import (
     EmployeeIdpViewSet,
     EmployeeViewSet,
     EmployeeWithoutIdpViewSet,
+    UserInfoViewSet,
 )
 
 app_name = "api"
 
 router = routers.DefaultRouter()
+router.register("user-info", UserInfoViewSet, basename="user-info")
 router.register("employees", EmployeeViewSet, basename="employees")
 router.register(
     "employees-without-idp",
