@@ -3,6 +3,20 @@ from rest_framework import serializers
 from apps.users.models import User
 
 
+class UserInfoSerializer(serializers.ModelSerializer):
+    """Сериализация данных, включая роль, о текущем сотруднике."""
+
+    role = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ["id", "fio", "job_title", "photo", "role"]
+
+    def get_role(self, obj):
+        user_role = obj.user_role.first()
+        return user_role.role if user_role else None
+
+
 class UserSerializer(serializers.ModelSerializer):
     """Сериализация данных о сотруднике: ФИО, должность и фото.
 
