@@ -1,14 +1,32 @@
+import nested_admin
 from django.contrib import admin
 from django.contrib.auth.models import Group
 
 from apps.idps.models import Comment, Goal, Idp, Task
 
 
+class TaskForIprAdmin(nested_admin.NestedTabularInline):
+    model = Task
+    fields = ["text"]
+    min_num = 1
+    extra = 0
+
+
+class GoalForIprAdmin(nested_admin.NestedStackedInline):
+    model = Goal
+    min_num = 1
+    extra = 0
+    inlines = [TaskForIprAdmin]
+
+
 @admin.register(Task)
 class TaskAdmin(admin.ModelAdmin):
-    list_display = ("pk", "text", "created_at")
+    list_display = ("pk", "text", "goal_id", "created_at")
     search_fields = ("text",)
-    list_filter = ("created_at",)
+    list_filter = (
+        "goal__title",
+        "created_at",
+    )
     empty_value_display = "-пусто-"
 
 
@@ -16,7 +34,7 @@ class TaskAdmin(admin.ModelAdmin):
 class GoalAdmin(admin.ModelAdmin):
     @admin.display(description="Задачи")
     def tasks_list(self, obj):
-        return list(task for task in obj.goals_tasks.all())
+        return list(task.id for task in obj.goals_tasks.all())
 
     list_display = (
         "id",
@@ -25,17 +43,18 @@ class GoalAdmin(admin.ModelAdmin):
         "status",
         "tasks_list",
         "deadline",
-        "idp",
+        "idp_id",
     )
-    list_filter = ("idp", "deadline", "created_at")
+    list_filter = ("idp", "deadline", "created_at", "status")
     empty_value_display = "-пусто-"
+    exclude = ("finished_at",)
 
 
 @admin.register(Idp)
-class IdpAdmin(admin.ModelAdmin):
+class IdpAdmin(nested_admin.NestedModelAdmin):
     @admin.display(description="Цели")
     def goals_list(self, obj):
-        return list(goal for goal in obj.idp_goals.all())
+        return list(goal.id for goal in obj.idp_goals.all())
 
     list_display = (
         "pk",
@@ -49,6 +68,8 @@ class IdpAdmin(admin.ModelAdmin):
     )
     search_fields = ("title", "chief", "employee", "status")
     list_filter = ("created_at", "chief", "employee", "status")
+    inlines = [GoalForIprAdmin]
+    exclude = ("finished_at",)
     empty_value_display = "-пусто-"
 
 

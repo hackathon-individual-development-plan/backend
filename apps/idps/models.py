@@ -52,14 +52,18 @@ class Idp(CommonCleanMixin, models.Model):
         constraints = [
             UniqueConstraint(
                 fields=["title", "chief", "employee"],
-                name="unique_idp_for_employee",
+                name="Возможно это не ваш сотрудник?",
+            ),
+            models.CheckConstraint(
+                name="У сотрудника уже есть ИПР со статусом 'В работе'",
+                check=~models.Q(status="In progress"),
             ),
             CheckConstraint(
                 name="self_follow",
                 check=~models.Q(chief=models.F("employee")),
             ),
         ]
-        ordering = ("created_at", "employee", "chief", "status")
+        ordering = ("id", "created_at", "employee", "chief", "status")
 
     def __str__(self):
         return self.title
@@ -70,6 +74,13 @@ class Idp(CommonCleanMixin, models.Model):
             chief=self.chief, employee=self.employee
         ).exists():
             raise ValidationError("Возможно это не ваш сотрудник?")
+        if self.status == "IN_PROGRESS":
+            if Idp.objects.filter(
+                employee=self.employee, status="In progress"
+            ):
+                raise ValidationError(
+                    "У сотрудника уже есть ИПР со статусом 'В работе'"
+                )
 
 
 class Goal(models.Model):
@@ -106,7 +117,7 @@ class Goal(models.Model):
     class Meta:
         verbose_name = "Цель ИПР"
         verbose_name_plural = "Цели для ИПР"
-        ordering = ("created_at", "idp__title", "status", "deadline")
+        ordering = ("id", "created_at", "idp__title", "status", "deadline")
 
     def __str__(self):
         return self.title

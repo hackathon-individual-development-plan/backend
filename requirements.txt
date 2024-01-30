@@ -36,5 +36,5 @@ tomli==2.0.1
 typing_extensions==4.9.0
 uritemplate==4.1.1
 virtualenv==20.25.0
-
+django-nested-admin==4.0.2
 openpyxl~=3.1.2
