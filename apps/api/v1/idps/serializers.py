@@ -291,10 +291,13 @@ class PutIdpSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         errors = []
-        if not data.get("idp_goals"):
+        goals = data.get("idp_goals")
+        if not goals:
             errors.append("Должна быть как минимум одна цель")
-        if not data.get("idp_goals__goals_tasks"):
-            errors.append("Должна быть как минимум одна задача")
+        for goal in goals:
+            tasks = goal.get("goals_tasks")
+            if not tasks:
+                errors.append("Должна быть как минимум одна задача")
         if Idp.objects.filter(
             chief=self.context["request"].user,
             employee=data.get("employee"),
