@@ -1,11 +1,16 @@
+import datetime
+
 from django.core.exceptions import ValidationError
+from django.db import transaction
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
 
 from apps.api.v1.users.serializers.users import (
     UserFIOSerializer,
     UserSerializer,
 )
+from apps.api.v1.validators import deadline_validator
 from apps.idps.models import Comment, Goal, Idp, Task
 from apps.users.models import User
 
@@ -91,6 +96,7 @@ class PostGoalSerializer(serializers.ModelSerializer):
     Сериализатор для создания целей ИПР.
     """
 
+    deadline = serializers.DateTimeField(validators=[deadline_validator])
     tasks = PostTaskSerializer(many=True)
 
     class Meta:
@@ -104,12 +110,13 @@ class PutGoalSerializer(serializers.ModelSerializer):
     id - опционально.
     """
 
+    deadline = serializers.DateTimeField(validators=[deadline_validator])
     id = serializers.IntegerField(required=False)
     tasks = TaskSerializer(source="goals_tasks", many=True)
 
     class Meta:
         model = Goal
-        fields = ("id", "title", "description", "deadline", "tasks")
+        fields = ("id", "title", "description", "deadline", "status", "tasks")
 
 
 class IdpSerializer(serializers.ModelSerializer):
@@ -144,7 +151,14 @@ class PostIdpSerializer(serializers.ModelSerializer):
 
     goals = PostGoalSerializer(many=True)
     employee = serializers.SlugRelatedField(
-        queryset=User.objects.all(), slug_field="id"
+        queryset=User.objects.all(),
+        slug_field="id",
+        validators=[
+            UniqueValidator(
+                queryset=Idp.objects.filter(status="In progress"),
+                message="У этого сотрудника уже есть ИПР со статусом 'В работе'!",
+            )
+        ],
     )
 
     class Meta:
@@ -153,22 +167,44 @@ class PostIdpSerializer(serializers.ModelSerializer):
         read_only_fields = ("chief",)
 
     def create_goals_for_idp(self, goals, idp):
-        list_of_task = []
-        for goal in goals:
-            tasks = goal.pop("tasks")
-            goal_obj = Goal.objects.create(**goal, idp=idp)
-            for task in tasks:
-                task["goal_id"] = goal_obj.id
-                task_obj, created = Task.objects.get_or_create(task)
-                list_of_task.append(task_obj.id)
+        with transaction.atomic():
+            for goal in goals:
+                tasks = goal.pop("tasks")
+                goal_obj = Goal.objects.create(**goal, idp=idp)
+                tasks_to_create = [
+                    Task(**task, goal_id=goal_obj.id) for task in tasks
+                ]
+                Task.objects.bulk_create(tasks_to_create)
 
     def create(self, validated_data):
         goals = validated_data.pop("goals")
-        idp = Idp.objects.create(
-            **validated_data, chief=self.context["request"].user
-        )
-        self.create_goals_for_idp(goals, idp)
+        with transaction.atomic():
+            idp = Idp.objects.create(
+                **validated_data, chief=self.context["request"].user
+            )
+            self.create_goals_for_idp(goals, idp)
         return idp
+
+    def validate(self, data):
+        errors = []
+        goals = data.get("goals")
+        if not goals:
+            errors.append("Должна быть как минимум одна цель")
+        for goal in goals:
+            tasks = goal.get("tasks")
+            if not tasks:
+                errors.append("Должна быть как минимум одна задача")
+        if self.context["request"].user == data.get("employee"):
+            errors.append("Создать ИПР себе нельзя!")
+        if Idp.objects.filter(
+            chief=self.context["request"].user,
+            employee=data.get("employee"),
+            title=data.get("title"),
+        ):
+            errors.append("У этого сотрудника уже есть ИПР с таким названием")
+        if errors:
+            raise ValidationError(errors)
+        return data
 
     def to_representation(self, instance):
         return IdpSerializer(
@@ -196,43 +232,41 @@ class PutIdpSerializer(serializers.ModelSerializer):
         if instance.chief != self.context["request"].user:
             raise ValidationError("Исправлять может только автор")
 
-        goals_data = validated_data["idp_goals"]
-        goals_ids = [
-            goal_data.get("id", None)
-            for goal_data in goals_data
-            if goal_data.get("id", None) is not None
-        ]
-        # Удаление целей, которых нет в запросе
-        instance.idp_goals.exclude(id__in=goals_ids).delete()
+        with transaction.atomic():
+            goals_data = validated_data.pop("idp_goals")
+            goals_ids = [
+                goal_data.get("id", None)
+                for goal_data in goals_data
+                if goal_data.get("id", None) is not None
+            ]
+            # Удаление целей, которых нет в запросе
+            instance.idp_goals.exclude(id__in=goals_ids).delete()
+            # Проставление даты закрытия ИПР
+            if validated_data["status"] == "Work done":
+                validated_data["finished_at"] = datetime.datetime.now()
+            super().update(instance, validated_data)
+            # Обновление существующих целей или создание новых целей
+            for goal_data in goals_data:
+                goal_id = goal_data.get("id", None)
+                tasks_data = goal_data.pop("goals_tasks", [])
+                if goal_id is not None:
+                    # Обновление существующей цели
+                    if goal_data["status"] == "Work done":
+                        goal_data["finished_at"] = datetime.datetime.now()
+                    goal_instance = get_object_or_404(Goal, id=goal_id)
+                    super().update(goal_instance, goal_data)
 
-        # Обновление существующих целей или создание новых целей
-        for goal_data in goals_data:
-            goal_id = goal_data.get("id", None)
-            tasks_data = goal_data.pop("goals_tasks", [])
+                    # Обновление задач для цели
+                    self.update_or_create_tasks(goal_instance, tasks_data)
 
-            if goal_id is not None:
-                # Обновление существующей цели
-                goal_instance = get_object_or_404(
-                    Goal, id=goal_id, idp=instance
-                )
-                goal_serializer = GoalSerializer(
-                    goal_instance, data=goal_data, partial=True
-                )
-                goal_serializer.is_valid(raise_exception=True)
-                goal_serializer.save()
+                else:
+                    # Создание новой цели
+                    goal_serializer = GoalSerializer(data=goal_data)
+                    goal_serializer.is_valid(raise_exception=True)
+                    goal_instance = goal_serializer.save(idp=instance)
 
-                # Обновление задач для цели
-                self.update_or_create_tasks(goal_instance, tasks_data)
-
-            else:
-                # Создание новой цели
-                goal_serializer = GoalSerializer(data=goal_data)
-                goal_serializer.is_valid(raise_exception=True)
-                goal_instance = goal_serializer.save(idp=instance)
-
-                # Создание задач для новой цели
-                self.update_or_create_tasks(goal_instance, tasks_data)
-
+                    # Создание задач для новой цели
+                    self.update_or_create_tasks(goal_instance, tasks_data)
         return instance
 
     def update_or_create_tasks(self, goal_instance, tasks_data):
@@ -250,20 +284,32 @@ class PutIdpSerializer(serializers.ModelSerializer):
 
             if task_id is not None:
                 # Обновление существующей задачи
-                task_instance = get_object_or_404(
-                    Task, id=task_id, goal=goal_instance
-                )
-                task_serializer = TaskSerializer(
-                    task_instance, data=task_data, partial=True
-                )
-                task_serializer.is_valid(raise_exception=True)
-                task_serializer.save()
-
+                task_instance = get_object_or_404(Task, id=task_id)
+                super().update(task_instance, task_data)
             else:
                 # Создание новой задачи
                 task_serializer = TaskSerializer(data=task_data)
                 task_serializer.is_valid(raise_exception=True)
                 task_serializer.save(goal=goal_instance)
+
+    def validate(self, data):
+        errors = []
+        goals = data.get("idp_goals")
+        if not goals:
+            errors.append("Должна быть как минимум одна цель")
+        for goal in goals:
+            tasks = goal.get("goals_tasks")
+            if not tasks:
+                errors.append("Должна быть как минимум одна задача")
+        if Idp.objects.filter(
+            chief=self.context["request"].user,
+            employee=data.get("employee"),
+            title=data.get("title"),
+        ):
+            errors.append("У этого сотрудника уже есть ИПР с таким названием")
+        if errors:
+            raise ValidationError(errors)
+        return data
 
     def to_representation(self, instance):
         return IdpSerializer(

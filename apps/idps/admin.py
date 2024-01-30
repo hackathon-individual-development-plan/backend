@@ -14,11 +14,16 @@ class TaskAdmin(admin.ModelAdmin):
 
 @admin.register(Goal)
 class GoalAdmin(admin.ModelAdmin):
+    @admin.display(description="Задачи")
+    def tasks_list(self, obj):
+        return list(task for task in obj.goals_tasks.all())
+
     list_display = (
         "id",
         "title",
         "description",
         "status",
+        "tasks_list",
         "deadline",
         "idp",
     )
@@ -28,13 +33,19 @@ class GoalAdmin(admin.ModelAdmin):
 
 @admin.register(Idp)
 class IdpAdmin(admin.ModelAdmin):
+    @admin.display(description="Цели")
+    def goals_list(self, obj):
+        return list(goal for goal in obj.idp_goals.all())
+
     list_display = (
         "pk",
         "title",
         "chief",
         "employee",
+        "goals_list",
         "status",
         "created_at",
+        "finished_at",
     )
     search_fields = ("title", "chief", "employee", "status")
     list_filter = ("created_at", "chief", "employee", "status")

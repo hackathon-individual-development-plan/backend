@@ -123,7 +123,9 @@ AUTH_USER_MODEL = "users.User"
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.IsAuthenticated",  # DEBUG: rest_framework.permissions.AllowAny
+        "rest_framework.permissions.IsAuthenticated",
+        # DEBUG:
+        # "rest_framework.permissions.AllowAny",
     ],
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.TokenAuthentication",
@@ -150,6 +152,8 @@ SPECTACULAR_SETTINGS = {
 LANGUAGE_CODE = "ru-ru"
 
 TIME_ZONE = "UTC"
+
+DATETIME_FORMAT = "%d-%m-%Y %H:%M:%S"
 
 USE_I18N = True
 

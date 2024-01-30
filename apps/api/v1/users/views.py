@@ -8,6 +8,8 @@ from rest_framework.response import Response
 from apps.idps.models import Idp, Status
 from apps.users.models import ChiefEmployee
 
+from ..mixins import ListViewSet
+from ..permissions import IsChief, ReadOnly
 from .filters import EmployeeWithoutIdpFilter
 from .serializers.employees import (
     EmployeeMyIdpSerializer,
@@ -30,12 +32,13 @@ class UserInfoViewSet(viewsets.GenericViewSet):
         return Response(serializer.data)
 
 
-class EmployeeViewSet(viewsets.GenericViewSet):
+class EmployeeViewSet(ListViewSet):
     """Вьюсет используется для получения списка всех сотрудников
     текущего пользователя - руководителя -
     и информации об их ИПР (айди, название, статус).
     """
 
+    permission_classes = (IsChief,)
     serializer_class = EmployeeSerializer
 
     def get_queryset(self):
@@ -52,18 +55,14 @@ class EmployeeViewSet(viewsets.GenericViewSet):
             )
         )
 
-    def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
 
-
-class EmployeeWithoutIdpViewSet(viewsets.GenericViewSet):
+class EmployeeWithoutIdpViewSet(ListViewSet):
     """Вьюсет используется для получения списка сотрудников
     текущего пользователя - руководителя, -
     у которых отсутствует ИПР в статусе В работе.
     """
 
+    permission_classes = (IsChief,)
     serializer_class = EmployeeWithoutIdpSerializer
     filter_backends = (DjangoFilterBackend, SearchFilter)
     filterset_class = EmployeeWithoutIdpFilter
@@ -77,16 +76,13 @@ class EmployeeWithoutIdpViewSet(viewsets.GenericViewSet):
             employee__in=employees_with_idp
         )
 
-    def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
 
-
-class EmployeeIdpViewSet(viewsets.GenericViewSet):
+class EmployeeIdpViewSet(ListViewSet):
     """Вьюсет используется для получения данных о последнем ИПР
     (Мой ИПР) текущего пользователя - сотрудника.
     """
+
+    permission_classes = (ReadOnly,)
 
     serializer_class = EmployeeMyIdpSerializer
 
@@ -105,9 +101,3 @@ class EmployeeIdpViewSet(viewsets.GenericViewSet):
                 queryset=Idp.objects.filter(id__in=Subquery(latest_idp)),
             )
         )
-
-    @action(detail=False, methods=["get"], url_path="my-idp")
-    def get_my_idp(self, request):
-        instance = self.get_queryset().get()
-        serializer = self.get_serializer(instance)
-        return Response(serializer.data)

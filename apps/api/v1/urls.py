@@ -20,12 +20,12 @@ router.register(
     basename="employees-without-idp",
 )
 router.register(
-    "employee",
+    "employee/my-idp",
     EmployeeIdpViewSet,
     basename="employee",
 )
 router.register(
-    r"idps/(?P<idp_id>\d+)/goals/(?P<goal_id>\d+)/comments",
+    r"goals/(?P<goal_id>\d+)/comments",
     CommentViewSet,
     basename="comments",
 )
