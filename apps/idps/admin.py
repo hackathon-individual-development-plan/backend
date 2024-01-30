@@ -57,10 +57,10 @@ class IdpAdmin(nested_admin.NestedModelAdmin):
         return list(goal.id for goal in obj.idp_goals.all())
 
     list_display = (
-        "pk",
         "title",
-        "chief",
+        "pk",
         "employee",
+        "chief",
         "goals_list",
         "status",
         "created_at",

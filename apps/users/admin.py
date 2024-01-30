@@ -8,8 +8,8 @@ from .models import ChiefEmployee, User, UserRole
 class CustomUserAdmin(UserAdmin):
     fieldsets = ((None, {"fields": ("fio", "job_title", "photo")}),)
     list_display = (
-        "id",
         "username",
+        "id",
         "fio",
         "job_title",
     )

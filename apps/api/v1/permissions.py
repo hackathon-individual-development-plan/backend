@@ -14,9 +14,8 @@ class IsChiefOrReadOnly(BasePermission):
     """Выдает права создавать и редактировать ИПР."""
 
     def has_permission(self, request, view):
-        return (
-            UserRole.objects.filter(user=request.user, role="chief")
-            or request.method in SAFE_METHODS
+        return UserRole.objects.filter(user=request.user, role="chief") or (
+            request.method in SAFE_METHODS and request.user.is_authenticated
         )
 
     def has_object_permission(self, request, view, obj):

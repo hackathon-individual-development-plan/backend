@@ -189,8 +189,13 @@ class PostIdpSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         errors = []
-        if not data.get("goals"):
+        goals = data.get("goals")
+        if not goals:
             errors.append("Должна быть как минимум одна цель")
+        for goal in goals:
+            tasks = goal.get("tasks")
+            if not tasks:
+                errors.append("Должна быть как минимум одна задача")
         if self.context["request"].user == data.get("employee"):
             errors.append("Создать ИПР себе нельзя!")
         if Idp.objects.filter(

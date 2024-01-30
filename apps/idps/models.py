@@ -54,10 +54,10 @@ class Idp(CommonCleanMixin, models.Model):
                 fields=["title", "chief", "employee"],
                 name="Возможно это не ваш сотрудник?",
             ),
-            models.CheckConstraint(
-                name="У сотрудника уже есть ИПР со статусом 'В работе'",
-                check=~models.Q(status="In progress"),
-            ),
+            # models.CheckConstraint(
+            #     name="У сотрудника уже есть ИПР со статусом 'В работе'",
+            #     check=~models.Q(status="In progress"),
+            # ),
             CheckConstraint(
                 name="self_follow",
                 check=~models.Q(chief=models.F("employee")),
@@ -74,10 +74,10 @@ class Idp(CommonCleanMixin, models.Model):
             chief=self.chief, employee=self.employee
         ).exists():
             raise ValidationError("Возможно это не ваш сотрудник?")
-        if self.status == "IN_PROGRESS":
+        if self.status == "In progress":
             if Idp.objects.filter(
                 employee=self.employee, status="In progress"
-            ):
+            ).exclude(pk=self.pk):
                 raise ValidationError(
                     "У сотрудника уже есть ИПР со статусом 'В работе'"
                 )

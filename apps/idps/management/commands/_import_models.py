@@ -11,9 +11,12 @@ def import_users(obj):
     cells = obj.iter_rows()
 
     employee_list = []
-    for username, fio, job_title, role in cells:
+    for username, fio, job_title, role, photo in cells:
         user_obj = User.objects.create(
-            username=username.value, fio=fio.value, job_title=job_title.value
+            username=username.value,
+            fio=fio.value,
+            job_title=job_title.value,
+            photo=photo.value,
         )
         UserRole.objects.create(user=user_obj, role=role.value)
         if role.value == "chief":
