@@ -10,9 +10,9 @@ from apps.users.models import ChiefEmployee, CommonCleanMixin, User
 class Status(models.TextChoices):
     """Варианты статусов."""
 
-    IN_PROGRESS = ("In progress", "В работе")
-    WORK_DONE = ("Work done", "Выполнен")
-    NOT_DONE = ("Not done", "Не выполнен")
+    IN_PROGRESS = ("В работе", "In progress")
+    WORK_DONE = ("Выполнен", "Work done")
+    NOT_DONE = ("Не выполнен", "Not done")
 
 
 class Idp(CommonCleanMixin, models.Model):
@@ -54,10 +54,11 @@ class Idp(CommonCleanMixin, models.Model):
                 fields=["title", "chief", "employee"],
                 name="Возможно это не ваш сотрудник?",
             ),
-            # models.CheckConstraint(
-            #     name="У сотрудника уже есть ИПР со статусом 'В работе'",
-            #     check=~models.Q(status="In progress"),
-            # ),
+            UniqueConstraint(
+                name="У сотрудника уже есть ИПР со статусом 'В работе'",
+                fields=["employee"],
+                condition=models.Q(status=Status.IN_PROGRESS),
+            ),
             CheckConstraint(
                 name="self_follow",
                 check=~models.Q(chief=models.F("employee")),
@@ -74,9 +75,9 @@ class Idp(CommonCleanMixin, models.Model):
             chief=self.chief, employee=self.employee
         ).exists():
             raise ValidationError("Возможно это не ваш сотрудник?")
-        if self.status == "In progress":
+        if self.status == Status.IN_PROGRESS:
             if Idp.objects.filter(
-                employee=self.employee, status="In progress"
+                employee=self.employee, status=Status.IN_PROGRESS
             ).exclude(pk=self.pk):
                 raise ValidationError(
                     "У сотрудника уже есть ИПР со статусом 'В работе'"

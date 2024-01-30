@@ -11,7 +11,7 @@ from apps.api.v1.users.serializers.users import (
     UserSerializer,
 )
 from apps.api.v1.validators import deadline_validator
-from apps.idps.models import Comment, Goal, Idp, Task
+from apps.idps.models import Comment, Goal, Idp, Status, Task
 from apps.users.models import User
 
 
@@ -244,7 +244,7 @@ class PutIdpSerializer(serializers.ModelSerializer):
             # Удаление целей, которых нет в запросе
             instance.idp_goals.exclude(id__in=goals_ids).delete()
             # Проставление даты закрытия ИПР
-            if validated_data["status"] == "Work done":
+            if validated_data["status"] == Status.WORK_DONE:
                 validated_data["finished_at"] = datetime.datetime.now()
             super().update(instance, validated_data)
             # Обновление существующих целей или создание новых целей
@@ -253,7 +253,7 @@ class PutIdpSerializer(serializers.ModelSerializer):
                 tasks_data = goal_data.pop("goals_tasks", [])
                 if goal_id is not None:
                     # Обновление существующей цели
-                    if goal_data["status"] == "Work done":
+                    if goal_data["status"] == Status.WORK_DONE:
                         goal_data["finished_at"] = datetime.datetime.now()
                     goal_instance = get_object_or_404(Goal, id=goal_id)
                     super().update(goal_instance, goal_data)

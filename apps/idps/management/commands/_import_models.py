@@ -2,7 +2,7 @@ from django.utils.timezone import make_aware
 from faker import Faker
 
 from apps.idps.models import Comment, Goal, Idp, Task
-from apps.users.models import ChiefEmployee, User, UserRole
+from apps.users.models import ChiefEmployee, Role, User, UserRole
 
 fake = Faker()
 
@@ -19,7 +19,7 @@ def import_users(obj):
             photo=photo.value,
         )
         UserRole.objects.create(user=user_obj, role=role.value)
-        if role.value == "chief":
+        if role.value == Role.CHIEF:
             chief = user_obj
         else:
             employee_list.append(user_obj)
