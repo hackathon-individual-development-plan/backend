@@ -16,8 +16,9 @@ class IsChiefOrReadOnly(BasePermission):
     def has_permission(self, request, view):
         if not request.user.is_authenticated:
             return False
-        return UserRole.objects.filter(user=request.user, role="chief") or (
-            request.method in SAFE_METHODS
+        return (
+            UserRole.objects.filter(user=request.user, role="chief")
+            or request.method in SAFE_METHODS
         )
 
     def has_object_permission(self, request, view, obj):
