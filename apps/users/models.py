@@ -3,6 +3,8 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import UniqueConstraint
 
+from config import settings
+
 
 class CommonCleanMixin(models.Model):
     """Выполняет общие проверки для моделей, наследующих CommonCleanMixin.
@@ -48,10 +50,16 @@ class User(AbstractUser):
     """Модель пользователя."""
 
     fio = models.CharField(
-        max_length=255, blank=False, null=False, verbose_name="ФИО"
+        max_length=settings.FIELD_USER_FIO,
+        blank=False,
+        null=False,
+        verbose_name="ФИО",
     )
     job_title = models.CharField(
-        max_length=150, blank=False, null=False, verbose_name="Должность"
+        max_length=settings.FIELD_TITLE_LENGTH,
+        blank=False,
+        null=False,
+        verbose_name="Должность",
     )
     photo = models.ImageField(
         upload_to="user_photos/", blank=True, null=True, verbose_name="Фото"

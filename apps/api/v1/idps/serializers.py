@@ -10,7 +10,7 @@ from apps.api.v1.users.serializers.users import (
     UserFIOSerializer,
     UserSerializer,
 )
-from apps.api.v1.validators import deadline_validator
+from apps.api.v1.validators import deadline_validator, idp_validator
 from apps.idps.models import Comment, Goal, Idp, Status, Task
 from apps.users.models import User
 
@@ -114,7 +114,7 @@ class PutGoalSerializer(serializers.ModelSerializer):
 
     deadline = serializers.DateTimeField(validators=[deadline_validator])
     id = serializers.IntegerField(required=False)
-    tasks = TaskSerializer(source="goals_tasks", many=True)
+    tasks = TaskSerializer(many=True)
 
     class Meta:
         model = Goal
@@ -157,8 +157,8 @@ class PostIdpSerializer(serializers.ModelSerializer):
         slug_field="id",
         validators=[
             UniqueValidator(
-                queryset=Idp.objects.filter(status="In progress"),
-                message="У этого сотрудника уже есть ИПР со статусом 'В работе'!",
+                queryset=Idp.objects.filter(status=Status.IN_PROGRESS),
+                message="У сотрудника уже есть ИПР со статусом 'В работе'!",
             )
         ],
     )
@@ -188,30 +188,7 @@ class PostIdpSerializer(serializers.ModelSerializer):
         return idp
 
     def validate(self, data):
-        errors = []
-        goals = data.get("goals")
-        if not goals:
-            errors.append("Должна быть как минимум одна цель")
-        for goal in goals:
-            tasks = goal.get("tasks")
-            if not tasks:
-                errors.append("Должна быть как минимум одна задача")
-        if self.context["request"].user == data.get("employee"):
-            errors.append("Создать ИПР себе нельзя!")
-        if Idp.objects.filter(
-            chief=self.context["request"].user,
-            employee=data.get("employee"),
-            title=data.get("title"),
-        ):
-            errors.append("У этого сотрудника уже есть ИПР с таким названием")
-        if Idp.objects.filter(
-            employee=data.get("employee"),
-            status=Status.IN_PROGRESS,
-        ):
-            errors.append("У сотрудника уже есть ИПР со статусом 'В работе'")
-        if errors:
-            raise ValidationError(errors)
-        return data
+        return idp_validator(self, data, Idp)
 
     def to_representation(self, instance):
         return IdpSerializer(
@@ -224,7 +201,7 @@ class PutIdpSerializer(serializers.ModelSerializer):
     Сериализатор для редактирования ИПР.
     """
 
-    goals = PutGoalSerializer(source="idp_goals", many=True)
+    goals = PutGoalSerializer(many=True)
 
     class Meta:
         model = Idp
@@ -240,7 +217,7 @@ class PutIdpSerializer(serializers.ModelSerializer):
             raise ValidationError("Исправлять может только автор")
 
         with transaction.atomic():
-            goals_data = validated_data.pop("idp_goals")
+            goals_data = validated_data.pop("goals")
             goals_ids = [
                 goal_data.get("id", None)
                 for goal_data in goals_data
@@ -255,7 +232,7 @@ class PutIdpSerializer(serializers.ModelSerializer):
             # Обновление существующих целей или создание новых целей
             for goal_data in goals_data:
                 goal_id = goal_data.get("id", None)
-                tasks_data = goal_data.pop("goals_tasks", [])
+                tasks_data = goal_data.pop("tasks", [])
                 if goal_id is not None:
                     # Обновление существующей цели
                     if goal_data["status"] == Status.WORK_DONE:
@@ -300,23 +277,7 @@ class PutIdpSerializer(serializers.ModelSerializer):
                 task_serializer.save(goal=goal_instance)
 
     def validate(self, data):
-        errors = []
-        goals = data.get("idp_goals")
-        if not goals:
-            errors.append("Должна быть как минимум одна цель")
-        for goal in goals:
-            tasks = goal.get("goals_tasks")
-            if not tasks:
-                errors.append("Должна быть как минимум одна задача")
-        if Idp.objects.filter(
-            chief=self.context["request"].user,
-            employee=data.get("employee"),
-            title=data.get("title"),
-        ):
-            errors.append("У этого сотрудника уже есть ИПР с таким названием")
-        if errors:
-            raise ValidationError(errors)
-        return data
+        return idp_validator(self, data, Idp)
 
     def to_representation(self, instance):
         return IdpSerializer(

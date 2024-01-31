@@ -54,11 +54,6 @@ class Idp(CommonCleanMixin, models.Model):
                 fields=["title", "chief", "employee"],
                 name="unique_idp_for_employee",
             ),
-            UniqueConstraint(
-                name="У сотрудника уже есть ИПР со статусом 'В работе'",
-                fields=["employee"],
-                condition=models.Q(status=Status.IN_PROGRESS),
-            ),
             CheckConstraint(
                 name="self_follow",
                 check=~models.Q(chief=models.F("employee")),
@@ -90,7 +85,9 @@ class Goal(models.Model):
     title = models.CharField(
         max_length=settings.FIELD_TITLE_LENGTH, verbose_name="Название Цели"
     )
-    description = models.TextField(verbose_name="Описание Цели")
+    description = models.TextField(
+        max_length=settings.FIELD_DESCRIPTION, verbose_name="Описание Цели"
+    )
     status = models.CharField(
         max_length=max([len(status) for status in Status]),
         choices=Status,
@@ -127,7 +124,9 @@ class Goal(models.Model):
 class Task(models.Model):
     """Модель задачи."""
 
-    text = models.TextField(verbose_name="Задача")
+    text = models.TextField(
+        max_length=settings.FIELD_TITLE_LENGTH, verbose_name="Задача"
+    )
     goal = models.ForeignKey(
         Goal,
         on_delete=models.CASCADE,
@@ -153,7 +152,9 @@ class Task(models.Model):
 class Comment(models.Model):
     """Модель комментария."""
 
-    comment_text = models.TextField(verbose_name="Текст комментария")
+    comment_text = models.TextField(
+        max_length=settings.FIELD_COMMENTS, verbose_name="Текст комментария"
+    )
     goal = models.ForeignKey(
         Goal,
         blank=False,
