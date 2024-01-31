@@ -204,6 +204,11 @@ class PostIdpSerializer(serializers.ModelSerializer):
             title=data.get("title"),
         ):
             errors.append("У этого сотрудника уже есть ИПР с таким названием")
+        if Idp.objects.filter(
+            employee=data.get("employee"),
+            status=Status.IN_PROGRESS,
+        ):
+            errors.append("У сотрудника уже есть ИПР со статусом 'В работе'")
         if errors:
             raise ValidationError(errors)
         return data

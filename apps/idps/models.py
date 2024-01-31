@@ -52,7 +52,7 @@ class Idp(CommonCleanMixin, models.Model):
         constraints = [
             UniqueConstraint(
                 fields=["title", "chief", "employee"],
-                name="Возможно это не ваш сотрудник?",
+                name="unique_idp_for_employee",
             ),
             UniqueConstraint(
                 name="У сотрудника уже есть ИПР со статусом 'В работе'",

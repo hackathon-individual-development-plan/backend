@@ -78,7 +78,7 @@ class CommentAdmin(admin.ModelAdmin):
     list_display = (
         "pk",
         "comment_text",
-        "goal",
+        "goal_id",
         "user",
         "created_at",
     )
