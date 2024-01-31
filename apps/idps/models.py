@@ -10,9 +10,9 @@ from apps.users.models import ChiefEmployee, CommonCleanMixin, User
 class Status(models.TextChoices):
     """Варианты статусов."""
 
-    IN_PROGRESS = ("In progress", "В работе")
-    WORK_DONE = ("Work done", "Выполнен")
-    NOT_DONE = ("Not done", "Не выполнен")
+    IN_PROGRESS = ("В работе", "In progress")
+    WORK_DONE = ("Выполнен", "Work done")
+    NOT_DONE = ("Не выполнен", "Not done")
 
 
 class Idp(CommonCleanMixin, models.Model):
@@ -59,7 +59,7 @@ class Idp(CommonCleanMixin, models.Model):
                 check=~models.Q(chief=models.F("employee")),
             ),
         ]
-        ordering = ("created_at", "employee", "chief", "status")
+        ordering = ("id", "created_at", "employee", "chief", "status")
 
     def __str__(self):
         return self.title
@@ -70,6 +70,13 @@ class Idp(CommonCleanMixin, models.Model):
             chief=self.chief, employee=self.employee
         ).exists():
             raise ValidationError("Возможно это не ваш сотрудник?")
+        if self.status == Status.IN_PROGRESS:
+            if Idp.objects.filter(
+                employee=self.employee, status=Status.IN_PROGRESS
+            ).exclude(pk=self.pk):
+                raise ValidationError(
+                    "У сотрудника уже есть ИПР со статусом 'В работе'"
+                )
 
 
 class Goal(models.Model):
@@ -78,7 +85,9 @@ class Goal(models.Model):
     title = models.CharField(
         max_length=settings.FIELD_TITLE_LENGTH, verbose_name="Название Цели"
     )
-    description = models.TextField(verbose_name="Описание Цели")
+    description = models.TextField(
+        max_length=settings.FIELD_DESCRIPTION, verbose_name="Описание Цели"
+    )
     status = models.CharField(
         max_length=max([len(status) for status in Status]),
         choices=Status,
@@ -106,7 +115,7 @@ class Goal(models.Model):
     class Meta:
         verbose_name = "Цель ИПР"
         verbose_name_plural = "Цели для ИПР"
-        ordering = ("created_at", "idp__title", "status", "deadline")
+        ordering = ("id", "created_at", "idp__title", "status", "deadline")
 
     def __str__(self):
         return self.title
@@ -115,7 +124,9 @@ class Goal(models.Model):
 class Task(models.Model):
     """Модель задачи."""
 
-    text = models.TextField(verbose_name="Задача")
+    text = models.TextField(
+        max_length=settings.FIELD_TITLE_LENGTH, verbose_name="Задача"
+    )
     goal = models.ForeignKey(
         Goal,
         on_delete=models.CASCADE,
@@ -141,7 +152,9 @@ class Task(models.Model):
 class Comment(models.Model):
     """Модель комментария."""
 
-    comment_text = models.TextField(verbose_name="Текст комментария")
+    comment_text = models.TextField(
+        max_length=settings.FIELD_COMMENTS, verbose_name="Текст комментария"
+    )
     goal = models.ForeignKey(
         Goal,
         blank=False,

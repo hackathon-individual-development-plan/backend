@@ -41,6 +41,7 @@ DJANGO_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django_filters",
+    "nested_admin",
 ]
 
 LOCAL_APPS = [
@@ -153,7 +154,7 @@ LANGUAGE_CODE = "ru-ru"
 
 TIME_ZONE = "UTC"
 
-DATETIME_FORMAT = "%d-%m-%Y %H:%M:%S"
+DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 USE_I18N = True
 
@@ -177,4 +178,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # constants
 
-FIELD_TITLE_LENGTH = 200
+FIELD_TITLE_LENGTH = 30
+FIELD_DESCRIPTION = 100
+FIELD_COMMENTS = 400
+FIELD_USER_FIO = 150

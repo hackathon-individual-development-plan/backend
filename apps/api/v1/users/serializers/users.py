@@ -37,3 +37,14 @@ class UserFIOSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["id", "fio"]
+
+
+class UserCommentSerializer(serializers.ModelSerializer):
+    """Сериализация данных о сотруднике: ФИО и фото.
+
+    Используется в сериализаторе CommentSerializer.
+    """
+
+    class Meta:
+        model = User
+        fields = ["id", "fio", "photo"]
