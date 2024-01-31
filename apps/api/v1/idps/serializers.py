@@ -7,7 +7,7 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
 from apps.api.v1.users.serializers.users import (
-    UserFIOSerializer,
+    UserCommentSerializer,
     UserSerializer,
 )
 from apps.api.v1.validators import deadline_validator, idp_validator
@@ -32,7 +32,7 @@ class CommentSerializer(serializers.ModelSerializer):
     """
 
     created_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M")
-    user = UserFIOSerializer(read_only=True)
+    user = UserCommentSerializer(read_only=True)
 
     class Meta:
         model = Comment
