@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 
-from apps.users.models import User, UserRole, Role
+from apps.users.models import Role, User, UserRole
 
 
 class APITestCase(TestCase):
