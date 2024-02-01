@@ -1,9 +1,11 @@
+import datetime
+import datetime as dt
+
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import CheckConstraint, UniqueConstraint
 
-from apps.api.v1.validators import deadline_validator
 from apps.users.models import ChiefEmployee, CommonCleanMixin, User
 
 
@@ -100,7 +102,6 @@ class Goal(models.Model):
     deadline = models.DateTimeField(
         verbose_name="Дата дедлайна",
         db_index=True,
-        validators=(deadline_validator,),
     )
     idp = models.ForeignKey(
         Idp,
@@ -119,6 +120,16 @@ class Goal(models.Model):
 
     def __str__(self):
         return self.title
+
+    def clean(self):
+        super().clean()
+        if self.deadline < dt.datetime.now(
+            datetime.timezone.utc
+        ) + dt.timedelta(days=1):
+            raise ValidationError(
+                "Дата дедлайна должна быть больше,"
+                " чем сейчас хотя бы на один день"
+            )
 
 
 class Task(models.Model):
