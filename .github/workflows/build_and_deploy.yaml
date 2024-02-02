@@ -18,7 +18,6 @@ defaults:
 jobs:
   buld_and_push_image_to_github_packages:
     name: Build and push image to GitHub Packages
-    #if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -50,7 +49,6 @@ jobs:
 
   deploy:
     name: Deploy and start the App
-    # if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     needs: buld_and_push_image_to_github_packages
     environment:
@@ -64,10 +62,10 @@ jobs:
         name: Copy docker-compose and nginx files to server
         uses: appleboy/scp-action@v0.1.4
         with:
-          host: ${{ secrets.HOST }} # адрес сервера
+          host: ${{ secrets.HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
-          port: ${{ secrets.SSH_PORT }} # 22
+          port: ${{ secrets.SSH_PORT }}
           source: "infra/docker-compose.prod.yaml,infra/nginx/templates/default.conf.prod.template"
           target: ${{ env.DEPLOY_PATH }}
           overwrite: true
