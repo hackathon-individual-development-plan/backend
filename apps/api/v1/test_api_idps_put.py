@@ -45,19 +45,16 @@ class IdpApiTestCase(APITestCase):
             employee=cls.employee_user,
             chief=cls.chief_user,
         )
-        print(idp)
         goal = Goal.objects.create(
             title="Цель для теста",
             description="описание цели для теста ипр",
             deadline="2024-12-31",
             idp=idp,
         )
-        print(goal)
         tasks_list = [
             Task(text=f"Задача{i} для цели", goal=goal) for i in [1, 2, 3]
         ]
         Task.objects.bulk_create(tasks_list)
-        print(tasks_list)
 
     @classmethod
     def tearDownClass(cls):
@@ -155,6 +152,13 @@ class IdpApiTestCase(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(Goal.objects.count(), 2)
+
+    def test_put_ids_error_deadline(self):
+        data = self.check_data(deadline="2023-12-31")
+        response = self.chief_client.put(
+            path="/api/v1/idps/1/", data=data, format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_put_ids_new_task(self):
         data = self.check_data()
