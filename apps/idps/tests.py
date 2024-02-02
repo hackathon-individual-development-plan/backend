@@ -41,7 +41,7 @@ class APITestCase(TestCase):
 
     def test_endpoint_create_idps_by_employee(self):
         """Тестирование создания ИПР сотрудником."""
-        response = self.employee_client.get("/api/v1/idps/")
+        response = self.employee_client.post("/api/v1/idps/")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_endpoint_get_idps_by_employee(self):
