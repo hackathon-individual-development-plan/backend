@@ -6,16 +6,16 @@ on:
       - develop
       - main
 
-env:
-  DJANGO_SECRET_KEY: testsecretkey
-  DJANGO_ALLOWED_HOSTS: 127.0.0.1,localhost
-  CSRF_TRUSTED_ORIGINS: http://localhost
-  DB_ENGINE: django.db.backends.postgresql
-  DB_NAME: postgres
-  POSTGRES_USER: postgres
-  POSTGRES_PASSWORD: postgres
-  DB_HOST: localhost
-  DB_PORT: 5432
+# env:
+#   DJANGO_SECRET_KEY: testsecretkey
+#   DJANGO_ALLOWED_HOSTS: 127.0.0.1,localhost
+#   CSRF_TRUSTED_ORIGINS: http://localhost
+#   DB_ENGINE: django.db.backends.postgresql
+#   DB_NAME: postgres
+#   POSTGRES_USER: postgres
+#   POSTGRES_PASSWORD: postgres
+#   DB_HOST: localhost
+#   DB_PORT: 5432
 
 jobs:
   migrations:
@@ -41,6 +41,10 @@ jobs:
       -
         name: Check out the repo
         uses: actions/checkout@v3
+      -
+        name: Load Environment Variables
+        run: |
+          cp .env.example .env
       -
         name: Set up Python
         uses: actions/setup-python@v4
