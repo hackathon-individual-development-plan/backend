@@ -98,19 +98,6 @@ class IdpApiTestCase(APITestCase):
             ],
         }
 
-    # def test_endpoint_access_employee_my_idp_retrieve(self):
-    #     response = self.employee_client.get("/api/v1/employee/my-idp/")
-    #     print(response)
-    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
-    #
-    # def test_endpoint_access_employees(self):
-    #     response = self.chief_client.get("/api/v1/employees/")
-    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
-    #
-    # def test_endpoint_access_employees_without_idp(self):
-    #     response = self.chief_client.get("/api/v1/employees-without-idp/")
-    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
-
     def test_put_ids_change(self):
         data = self.check_data(
             title_idp="new ипр",
