@@ -37,6 +37,14 @@ services:
     depends_on:
       - hackathon-db
 
+  frontend:
+     build:
+       context: ../../frontend
+       dockerfile: Dockerfile
+     container_name: frontend
+     volumes:
+       - frontend_static:/app/build
+
   nginx:
     image: nginx:alpine
     container_name: nginx
@@ -51,6 +59,7 @@ services:
       - frontend_static:/var/html/frontend
     depends_on:
       - backend
+      - frontend
 
 volumes:
   db_data:
