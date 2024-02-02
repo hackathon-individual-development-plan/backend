@@ -38,12 +38,12 @@ services:
       - hackathon-db
 
   frontend:
-     build:
-       context: ../../frontend
-       dockerfile: Dockerfile
-     container_name: frontend
-     volumes:
-       - frontend_static:/app/build
+    build:
+      context: ../../frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    volumes:
+      - frontend_static:/app/build
 
   nginx:
     image: nginx:alpine
