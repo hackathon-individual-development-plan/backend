@@ -7,81 +7,84 @@ from apps.users.models import ChiefEmployee, Role, User, UserRole
 
 
 class IdpApiTestCase(APITestCase):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
+    def setUp(self):
         # Создаем пользователя с ролью Сотрудник
-        cls.employee_user = User.objects.create(
+        self.employee_user = User.objects.create(
             username="employee", fio="ФИО", job_title="Employee"
         )
-        cls.employee_token = Token.objects.create(user=cls.employee_user)
-        cls.employee_client = APIClient()
-        cls.employee_client.credentials(
-            HTTP_AUTHORIZATION="Token " + cls.employee_token.key
+        self.employee_token = Token.objects.create(user=self.employee_user)
+        self.employee_client = APIClient()
+        self.employee_client.credentials(
+            HTTP_AUTHORIZATION="Token " + self.employee_token.key
         )
-        cls.employee_role = UserRole.objects.create(
-            user=cls.employee_user, role=Role.EMPLOYEE
+        self.employee_role = UserRole.objects.create(
+            user=self.employee_user, role=Role.EMPLOYEE
         )
 
         # Создаем пользователя с ролью Руководитель
-        cls.chief_user = User.objects.create(
+        self.chief_user = User.objects.create(
             username="chief", fio="ФИО", job_title="Chief"
         )
-        cls.chief_token = Token.objects.create(user=cls.chief_user)
-        cls.chief_client = APIClient()
-        cls.chief_client.credentials(
-            HTTP_AUTHORIZATION="token " + cls.chief_token.key
+        self.chief_token = Token.objects.create(user=self.chief_user)
+        self.chief_client = APIClient()
+        self.chief_client.credentials(
+            HTTP_AUTHORIZATION="token " + self.chief_token.key
         )
-        cls.chief_role = UserRole.objects.create(
-            user=cls.chief_user, role=Role.CHIEF
+        self.chief_role = UserRole.objects.create(
+            user=self.chief_user, role=Role.CHIEF
         )
         # создаем связь руководитель-сотрудник
         ChiefEmployee.objects.create(
-            chief=cls.chief_user, employee=cls.employee_user
+            chief=self.chief_user, employee=self.employee_user
         )
 
         # Создаем ИПР для правки
-        cls.idp = Idp.objects.create(
+        self.idp = Idp.objects.create(
             title="ИПР для тестирования",
-            employee=cls.employee_user,
-            chief=cls.chief_user,
+            employee=self.employee_user,
+            chief=self.chief_user,
         )
-        cls.goal = Goal.objects.create(
+        self.goal = Goal.objects.create(
             title="Цель для теста",
             description="описание цели для теста ипр",
             deadline="2024-12-31",
-            idp=cls.idp,
+            idp=self.idp,
         )
         tasks_list = [
-            Task(text=f"Задача{i} для цели", goal=cls.goal) for i in [1, 2, 3]
+            Task(text=f"Задача{i} для цели", goal=self.goal) for i in [1, 2, 3]
         ]
-        Task.objects.bulk_create(tasks_list)
+        self.tasks = Task.objects.bulk_create(tasks_list)
         Comment.objects.create(
             comment_text="Тестовый комментарий",
-            goal=cls.goal,
-            user=cls.chief_user,
+            goal=self.goal,
+            user=self.chief_user,
         )
-
-    @classmethod
-    def tearDownClass(cls):
-        super().tearDownClass()
 
     def check_data(
         self,
         title_idp="ИПР для тестирования",
         status_idp="В работе",
-        goal_id=1,
+        goal_id=None,
         title_goal="Цель для теста",
         deadline="2024-12-31",
         status_goal="В работе",
         description_goal="описание цели для теста ипр",
-        task1_id=1,
+        task1_id=None,
         text_task1="Задача1 для цели",
-        task2_id=2,
+        task2_id=None,
         text_task2="Задача2 для цели",
-        task3_id=3,
+        task3_id=None,
         text_task3="Задача3 для цели",
     ):
+        if goal_id is None:
+            goal_id = self.goal.id
+        if task1_id is None:
+            task1_id = self.tasks[0].id
+        if task2_id is None:
+            task2_id = self.tasks[1].id
+        if task3_id is None:
+            task3_id = self.tasks[2].id
+
         return dict(
             title=title_idp,
             status=status_idp,
@@ -105,20 +108,20 @@ class IdpApiTestCase(APITestCase):
         data = self.check_data(
             title_idp="new ипр",
             status_idp="Выполнен",
-            goal_id=1,
+            goal_id=self.goal.id,
             title_goal="new Цель для теста",
             deadline="2024-11-29",
             status_goal="Выполнен",
             description_goal="new описание цели для теста ипр",
-            task1_id=2,
+            task1_id=self.tasks[1].id,
             text_task1="new Задача2 для цели",
-            task2_id=1,
+            task2_id=self.tasks[0].id,
             text_task2="new Задача1 для цели",
-            task3_id=3,
+            task3_id=self.tasks[2].id,
             text_task3="new Задача3 для цели",
         )
         response = self.chief_client.put(
-            path="/api/v1/idps/1/", data=data, format="json"
+            path=f"/api/v1/idps/{self.idp.id}/", data=data, format="json"
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -132,14 +135,14 @@ class IdpApiTestCase(APITestCase):
     def test_put_ids_error_goal(self):
         data = self.check_data(goal_id=2)
         response = self.chief_client.put(
-            path="/api/v1/idps/1/", data=data, format="json"
+            path=f"/api/v1/idps/{self.idp.id}/", data=data, format="json"
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_put_ids_error_task(self):
         data = self.check_data(task3_id=10)
         response = self.chief_client.put(
-            path="/api/v1/idps/1/", data=data, format="json"
+            path=f"/api/v1/idps/{self.idp.id}/", data=data, format="json"
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
@@ -154,7 +157,7 @@ class IdpApiTestCase(APITestCase):
             )
         )
         response = self.chief_client.put(
-            path="/api/v1/idps/1/", data=data, format="json"
+            path=f"/api/v1/idps/{self.idp.id}/", data=data, format="json"
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(Goal.objects.count(), 2)
@@ -162,7 +165,7 @@ class IdpApiTestCase(APITestCase):
     def test_put_ids_error_deadline(self):
         data = self.check_data(deadline="2023-12-31")
         response = self.chief_client.put(
-            path="/api/v1/idps/1/", data=data, format="json"
+            path=f"/api/v1/idps/{self.idp.id}/", data=data, format="json"
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -170,7 +173,7 @@ class IdpApiTestCase(APITestCase):
         data = self.check_data()
         data["goals"][0]["tasks"].append(dict(text="new task"))
         response = self.chief_client.put(
-            path="/api/v1/idps/1/", data=data, format="json"
+            path=f"/api/v1/idps/{self.idp.id}/", data=data, format="json"
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(Task.objects.count(), 4)
@@ -179,7 +182,7 @@ class IdpApiTestCase(APITestCase):
         data = self.check_data()
         data["goals"][0]["tasks"].pop()
         response = self.chief_client.put(
-            path="/api/v1/idps/1/", data=data, format="json"
+            path=f"/api/v1/idps/{self.idp.id}/", data=data, format="json"
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(Task.objects.count(), 2)
@@ -188,7 +191,7 @@ class IdpApiTestCase(APITestCase):
         data = self.check_data()
         data["goals"].pop()
         response = self.chief_client.put(
-            path="/api/v1/idps/1/", data=data, format="json"
+            path=f"/api/v1/idps/{self.idp.id}/", data=data, format="json"
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -204,7 +207,7 @@ class IdpApiTestCase(APITestCase):
             )
         )
         response = self.chief_client.put(
-            path="/api/v1/idps/1/", data=data, format="json"
+            path=f"/api/v1/idps/{self.idp.id}/", data=data, format="json"
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(Goal.objects.count(), 1)
@@ -212,13 +215,13 @@ class IdpApiTestCase(APITestCase):
     def test_put_ids_employee(self):
         data = self.check_data()
         response = self.employee_client.put(
-            path="/api/v1/idps/1/", data=data, format="json"
+            path=f"/api/v1/idps/{self.idp.id}/", data=data, format="json"
         )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_comment_in_idps_get(self):
         response = self.chief_client.get(
-            "/api/v1/idps/1/",
+            f"/api/v1/idps/{self.idp.id}/",
         )
         self.assertEqual(
             "Тестовый комментарий",
