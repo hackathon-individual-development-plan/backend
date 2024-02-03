@@ -1,4 +1,4 @@
-name: Check migrations
+name: Run tests
 
 on:
   pull_request:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   migrations:
-    name: Check migrations
+    name: Run tests
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -45,8 +45,5 @@ jobs:
         run: |
           cp infra/.env.example infra/.env
       -
-        name: Run migrations
-        run: python manage.py migrate
-      -
-        name: Check Migrations
-        run: python manage.py makemigrations --check
+        name: Run test
+        run: python manage.py test
