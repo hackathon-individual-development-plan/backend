@@ -102,6 +102,7 @@ class IdpApiTestCase(APITestCase):
         )
 
     def test_put_ids_change(self):
+        """Тестирование PUT запроса с правильными данными"""
         data = self.check_data(
             title_idp="new ипр",
             status_idp="Выполнен",
@@ -123,6 +124,7 @@ class IdpApiTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_put_ids_error_idp(self):
+        """Тестирование PUT запроса несуществующего ИПР"""
         data = self.check_data()
         response = self.chief_client.put(
             path="/api/v1/idps/2/", data=data, format="json"
@@ -130,6 +132,7 @@ class IdpApiTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_put_ids_error_goal(self):
+        """Тестирование PUT запроса: попытка изменить несуществующую цель"""
         data = self.check_data(goal_id=2)
         response = self.chief_client.put(
             path="/api/v1/idps/1/", data=data, format="json"
@@ -137,6 +140,7 @@ class IdpApiTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_put_ids_error_task(self):
+        """Тестирование PUT запроса: Попытка изменить несуществующую задачу"""
         data = self.check_data(task3_id=10)
         response = self.chief_client.put(
             path="/api/v1/idps/1/", data=data, format="json"
@@ -144,6 +148,7 @@ class IdpApiTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_put_ids_new_goal(self):
+        """Тестирование PUT запроса: добавление новой цели"""
         data = self.check_data()
         data["goals"].append(
             dict(
@@ -160,6 +165,7 @@ class IdpApiTestCase(APITestCase):
         self.assertEqual(Goal.objects.count(), 2)
 
     def test_put_ids_error_deadline(self):
+        """Тестирование PUT запроса: направильная дата дедлайна"""
         data = self.check_data(deadline="2023-12-31")
         response = self.chief_client.put(
             path="/api/v1/idps/1/", data=data, format="json"
@@ -167,6 +173,7 @@ class IdpApiTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_put_ids_new_task(self):
+        """Тестирование PUT запроса: добавление новой задачи"""
         data = self.check_data()
         data["goals"][0]["tasks"].append(dict(text="new task"))
         response = self.chief_client.put(
@@ -176,6 +183,7 @@ class IdpApiTestCase(APITestCase):
         self.assertEqual(Task.objects.count(), 4)
 
     def test_put_ids_del_task(self):
+        """Тестирование PUT запроса: удаление задачи"""
         data = self.check_data()
         data["goals"][0]["tasks"].pop()
         response = self.chief_client.put(
@@ -185,6 +193,7 @@ class IdpApiTestCase(APITestCase):
         self.assertEqual(Task.objects.count(), 2)
 
     def test_put_ids_empty_ids(self):
+        """Тестирование PUT запроса: удаление всех целей у ипр"""
         data = self.check_data()
         data["goals"].pop()
         response = self.chief_client.put(
@@ -193,6 +202,7 @@ class IdpApiTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_put_ids_del_goal_new_goal(self):
+        """Тестирование PUT запроса: добавление новой цели и удаление старой"""
         data = self.check_data()
         data["goals"].pop()
         data["goals"].append(
@@ -210,6 +220,7 @@ class IdpApiTestCase(APITestCase):
         self.assertEqual(Goal.objects.count(), 1)
 
     def test_put_ids_employee(self):
+        """Тестирование PUT запроса сотрудником"""
         data = self.check_data()
         response = self.employee_client.put(
             path="/api/v1/idps/1/", data=data, format="json"
@@ -217,6 +228,7 @@ class IdpApiTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_comment_in_idps_get(self):
+        """Тестирование GET ипр и проверка комментариев"""
         response = self.chief_client.get(
             "/api/v1/idps/1/",
         )
@@ -226,6 +238,7 @@ class IdpApiTestCase(APITestCase):
         )
 
     def test_comment_post(self):
+        """Тестирование POST запроса создание нового комментария"""
         response = self.chief_client.post(
             f"/api/v1/goals/{self.goal.pk}/comments/",
             data=dict(comment_text="Создание второго комментария"),
