@@ -64,7 +64,7 @@ Redoc:
     cd backend
   ```
 
-2. Создайте и активируйте виртуальное окружение
+2. Создайте и активируйте виртуальное окружение:
 
   ```
     python3 -m venv env
@@ -72,7 +72,7 @@ Redoc:
     source env/bin/activate (Для Linux)
   ```
 
-3. Установите зависимости
+3. Установите зависимости:
   ```
     python3 -m pip install --upgrade pip
     pip install -r requirements.txt
@@ -80,7 +80,7 @@ Redoc:
 
 ## Настройка <a id="setting"></a>
 
-1. Настроить pre-commit
+1. Настройте pre-commit:
   ```
     pre-commit install
   ```
@@ -94,7 +94,7 @@ Redoc:
     pre-commit run --all-files
   ```
 
-2. Перейдите в infra и создайте .env файл
+2. Перейдите в infra и создайте .env файл:
   ```
     cd infra
     touch infra/.env
