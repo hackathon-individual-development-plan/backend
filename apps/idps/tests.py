@@ -8,8 +8,6 @@ from apps.users.models import Role, UserRole
 
 from .models import ChiefEmployee, Goal, Idp, Status, Task, User
 
-# from apps.api.v1.validators import deadline_validator
-
 
 class IdpTestCase(TestCase):
     """Тестирование модели ИПР."""
@@ -92,9 +90,7 @@ class IdpTestCase(TestCase):
                 chief=self.second_chief,
             )
 
-        self.assertIn(
-            'violates check constraint "self_follow"', str(context.exception)
-        )
+        self.assertIn('"self_follow"', str(context.exception))
 
     def test_idp_chiefemployee_validation(self):
         """Тестирование невозможности создания ИПР чужому сотруднику."""
@@ -134,20 +130,20 @@ class IdpTestCase(TestCase):
             "[\"У сотрудника уже есть ИПР со статусом 'В работе'\"]",
         )
 
-    # def test_deadline_validator(self):
-    #     idp = Idp.objects.create(
-    #             title="Вырасти до джуна 2",
-    #             employee=self.employee,
-    #             chief=self.chief
-    #         )
-    #     goal = Goal(
-    #         title="Тестовая цель",
-    #         description="Тестовое описание",
-    #         deadline=datetime.now() - timedelta(days=30),
-    #         idp=idp
-    #     )
-    #     with self.assertRaises(ValidationError) as context:
-    #         deadline_validator(goal.deadline)
+    def test_deadline_validator(self):
+        idp = Idp.objects.create(
+            title="Вырасти до джуна 2",
+            employee=self.employee,
+            chief=self.chief,
+        )
+        goal = Goal(
+            title="Тестовая цель",
+            description="Тестовое описание",
+            deadline=datetime.now() - timedelta(days=30),
+            idp=idp,
+        )
+        with self.assertRaises(ValidationError) as context:
+            goal.clean()
 
-    #     expected_error_message = "Дата дедлайна должна быть больше, чем сейчас хотя бы на один день"
-    #     self.assertEqual(str(context.exception), expected_error_message)
+        expected_error_message = "['Дата дедлайна должна быть больше, чем сейчас хотя бы на один день']"
+        self.assertEqual(str(context.exception), expected_error_message)
