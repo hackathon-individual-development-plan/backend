@@ -100,7 +100,7 @@ MVP индивидуального плана развития для сотру
   - [Тихонова Ксения](https://github.com/TikhonovaKs)
   - [Фрикина София](https://github.com/SofiaFrikina)
 
-Backend
+- Backend
   - [Ротбардт Ольга](https://github.com/esfiro4ka)
   - [Дунаева Клавдия](https://github.com/KlavaD)
   - [Ковалев Никита](https://github.com/NV-Kovalev)
