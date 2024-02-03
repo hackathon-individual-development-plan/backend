@@ -36,7 +36,6 @@ class APITestCase(TestCase):
 
     def test_endpoint_access_employee_my_idp_retrieve(self):
         response = self.employee_client.get("/api/v1/employee/my-idp/")
-        print(self.employee_client._credentials)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_endpoint_access_employees(self):
