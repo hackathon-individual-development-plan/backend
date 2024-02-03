@@ -12,26 +12,25 @@ from .models import ChiefEmployee, Goal, Idp, Status, Task, User
 class IdpTestCase(TestCase):
     """Тестирование модели ИПР."""
 
-    @classmethod
-    def setUp(cls):
-        cls.chief = User.objects.create(
+    def setUp(self):
+        self.chief = User.objects.create(
             username="chief", fio="ФИО 1", job_title="Руководитель IT отдела"
         )
-        cls.employee = User.objects.create(
+        self.employee = User.objects.create(
             username="employee", fio="ФИО 2", job_title="Сотрудник IT отдела"
         )
-        UserRole.objects.create(user=cls.chief, role=Role.CHIEF)
-        UserRole.objects.create(user=cls.employee, role=Role.EMPLOYEE)
-        ChiefEmployee.objects.create(chief=cls.chief, employee=cls.employee)
+        UserRole.objects.create(user=self.chief, role=Role.CHIEF)
+        UserRole.objects.create(user=self.employee, role=Role.EMPLOYEE)
+        ChiefEmployee.objects.create(chief=self.chief, employee=self.employee)
 
-        cls.second_chief = User.objects.create(
+        self.second_chief = User.objects.create(
             username="secondchief", fio="ФИО 3", job_title="Шеф-повар"
         )
-        cls.second_employee = User.objects.create(
+        self.second_employee = User.objects.create(
             username="secondemployee", fio="ФИО 4", job_title="Повар"
         )
-        UserRole.objects.create(user=cls.second_employee, role=Role.EMPLOYEE)
-        UserRole.objects.create(user=cls.second_chief, role=Role.CHIEF)
+        UserRole.objects.create(user=self.second_employee, role=Role.EMPLOYEE)
+        UserRole.objects.create(user=self.second_chief, role=Role.CHIEF)
 
     def test_idp_create(self):
         """Тестирование создания ИПР, цели и задачи."""

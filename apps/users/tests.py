@@ -7,8 +7,7 @@ from .models import ChiefEmployee, Role, User, UserRole
 class UserTestCase(TestCase):
     """Тестирование модели пользователя"""
 
-    @classmethod
-    def setUp(cls):
+    def setUp(self):
         User.objects.create(username="user", fio="ФИО", job_title="Должность")
 
     def test_user_fio(self):
@@ -29,8 +28,7 @@ class UserTestCase(TestCase):
 class UserRoleTestCase(TestCase):
     """Тестирование модели связи между пользователями и их ролями"""
 
-    @classmethod
-    def setUp(cls):
+    def setUp(self):
         user = User.objects.create(
             username="user", fio="ФИО", job_title="Должность"
         )
@@ -47,8 +45,7 @@ class UserRoleTestCase(TestCase):
 class ChiefEmployeeTestCase(TestCase):
     """Тестирование модели связи м/д руководителями и их сотрудниками"""
 
-    @classmethod
-    def setUp(cls):
+    def setUp(self):
         chief_user = User.objects.create(
             username="chief_user", fio="ФИО", job_title="Chief"
         )
