@@ -2,13 +2,14 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient, APITestCase
 
-from apps.idps.models import Goal, Idp, Task
+from apps.idps.models import Comment, Goal, Idp, Task
 from apps.users.models import ChiefEmployee, Role, User, UserRole
 
 
 class IdpApiTestCase(APITestCase):
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
         # Создаем пользователя с ролью Сотрудник
         cls.employee_user = User.objects.create(
             username="employee", fio="ФИО", job_title="Employee"
@@ -40,25 +41,30 @@ class IdpApiTestCase(APITestCase):
         )
 
         # Создаем ИПР для правки
-        idp = Idp.objects.create(
+        cls.idp = Idp.objects.create(
             title="ИПР для тестирования",
             employee=cls.employee_user,
             chief=cls.chief_user,
         )
-        goal = Goal.objects.create(
+        cls.goal = Goal.objects.create(
             title="Цель для теста",
             description="описание цели для теста ипр",
             deadline="2024-12-31",
-            idp=idp,
+            idp=cls.idp,
         )
         tasks_list = [
-            Task(text=f"Задача{i} для цели", goal=goal) for i in [1, 2, 3]
+            Task(text=f"Задача{i} для цели", goal=cls.goal) for i in [1, 2, 3]
         ]
         Task.objects.bulk_create(tasks_list)
+        Comment.objects.create(
+            comment_text="Тестовый комментарий",
+            goal=cls.goal,
+            user=cls.chief_user,
+        )
 
     @classmethod
     def tearDownClass(cls):
-        User.objects.all().delete()
+        super().tearDownClass()
 
     def check_data(
         self,
@@ -76,24 +82,24 @@ class IdpApiTestCase(APITestCase):
         task3_id=3,
         text_task3="Задача3 для цели",
     ):
-        return {
-            "title": title_idp,
-            "status": status_idp,
-            "goals": [
-                {
-                    "id": goal_id,
-                    "title": title_goal,
-                    "deadline": deadline,
-                    "status": status_goal,
-                    "description": description_goal,
-                    "tasks": [
-                        {"id": task1_id, "text": text_task1},
-                        {"id": task2_id, "text": text_task2},
-                        {"id": task3_id, "text": text_task3},
+        return dict(
+            title=title_idp,
+            status=status_idp,
+            goals=[
+                dict(
+                    id=goal_id,
+                    title=title_goal,
+                    deadline=deadline,
+                    status=status_goal,
+                    description=description_goal,
+                    tasks=[
+                        dict(id=task1_id, text=text_task1),
+                        dict(id=task2_id, text=text_task2),
+                        dict(id=task3_id, text=text_task3),
                     ],
-                }
+                )
             ],
-        }
+        )
 
     def test_put_ids_change(self):
         data = self.check_data(
@@ -140,12 +146,12 @@ class IdpApiTestCase(APITestCase):
     def test_put_ids_new_goal(self):
         data = self.check_data()
         data["goals"].append(
-            {
-                "title": "new_goal",
-                "deadline": "2025-01-01",
-                "description": "new description",
-                "tasks": [{"text": "new task"}],
-            }
+            dict(
+                title="new_goal",
+                deadline="2025-01-01",
+                description="new description",
+                tasks=[dict(text="new task")],
+            )
         )
         response = self.chief_client.put(
             path="/api/v1/idps/1/", data=data, format="json"
@@ -162,7 +168,7 @@ class IdpApiTestCase(APITestCase):
 
     def test_put_ids_new_task(self):
         data = self.check_data()
-        data["goals"][0]["tasks"].append({"text": "new task"})
+        data["goals"][0]["tasks"].append(dict(text="new task"))
         response = self.chief_client.put(
             path="/api/v1/idps/1/", data=data, format="json"
         )
@@ -190,12 +196,12 @@ class IdpApiTestCase(APITestCase):
         data = self.check_data()
         data["goals"].pop()
         data["goals"].append(
-            {
-                "title": "new_goal",
-                "deadline": "2025-01-01",
-                "description": "new description",
-                "tasks": [{"text": "new task"}],
-            }
+            dict(
+                title="new_goal",
+                deadline="2025-01-01",
+                description="new description",
+                tasks=[dict(text="new task")],
+            )
         )
         response = self.chief_client.put(
             path="/api/v1/idps/1/", data=data, format="json"
@@ -209,3 +215,21 @@ class IdpApiTestCase(APITestCase):
             path="/api/v1/idps/1/", data=data, format="json"
         )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_comment_in_idps_get(self):
+        response = self.chief_client.get(
+            "/api/v1/idps/1/",
+        )
+        self.assertEqual(
+            "Тестовый комментарий",
+            response.data["goals"][0]["comments"][0]["comment_text"],
+        )
+
+    def test_comment_post(self):
+        response = self.chief_client.post(
+            f"/api/v1/goals/{self.goal.pk}/comments/",
+            data=dict(comment_text="Создание второго комментария"),
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Comment.objects.all().count(), 2)
