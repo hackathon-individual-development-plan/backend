@@ -37,7 +37,7 @@ class UserRoleTestCase(TestCase):
         UserRole.objects.create(user=user, role=Role.EMPLOYEE)
 
     def test_user_role_str(self):
-        user_role = UserRole.objects.get(id=1)
+        user_role = UserRole.objects.get()
         expected_str = (
             f"{user_role.user.username} - {user_role.get_role_display()}"
         )
