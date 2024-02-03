@@ -4,7 +4,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 
 from apps.idps.models import Goal, Idp, Task
-from apps.users.models import ChiefEmployee, User
+from apps.users.models import ChiefEmployee, Role, User, UserRole
 
 
 class APITestCase(TestCase):
@@ -19,6 +19,9 @@ class APITestCase(TestCase):
         cls.employee_client.credentials(
             HTTP_AUTHORIZATION="Token " + cls.employee_token.key
         )
+        cls.employee_role = UserRole.objects.create(
+            user=cls.employee_user, role=Role.EMPLOYEE
+        )
 
         # Создаем пользователя с ролью Руководитель
         cls.chief_user = User.objects.create(
@@ -28,6 +31,9 @@ class APITestCase(TestCase):
         cls.chief_client = APIClient()
         cls.chief_client.credentials(
             HTTP_AUTHORIZATION="Token " + cls.chief_token.key
+        )
+        cls.chief_role = UserRole.objects.create(
+            user=cls.chief_user, role=Role.CHIEF
         )
 
         # Создаем связь Руководитель-Сотрудник
@@ -90,16 +96,19 @@ class APITestCase(TestCase):
     def test_endpoint_create_idps_by_chief(self):
         """Тестирование создания ИПР руководителем."""
         data = self.check_data(
-            title_idp="New Idps",
-            title_goal="New Goal",
+            title_idp="Test Idps",
+            status_idp="Test Status Idp",
+            goal_id=1,
+            title_goal="Test Title Goal",
             deadline="2024-03-08",
-            description_goal="New description goal",
-            task1_id=2,
-            text_task1="New Task1",
-            task2_id=1,
-            text_task2="New Task2",
+            status_goal="Test Status Goal",
+            description_goal="Test Description Goal",
+            task1_id=1,
+            text_task1="Test Text Task1",
+            task2_id=2,
+            text_task2="Test Text Task2",
             task3_id=3,
-            text_task3="New Task3",
+            text_task3="Test Text Task3",
         )
         response = self.chief_client.post(
             "/api/v1/idps/", data=data, format="json"
@@ -124,7 +133,21 @@ class APITestCase(TestCase):
 
     def test_endpoint_create_idps_by_employee(self):
         """Тестирование создания ИПР сотрудником."""
-        data = self.check_data()
+        data = self.check_data(
+            title_idp="Test Idps",
+            status_idp="Test Status Idp",
+            goal_id=1,
+            title_goal="Test Title Goal",
+            deadline="2024-03-08",
+            status_goal="Test Status Goal",
+            description_goal="Test Description Goal",
+            task1_id=1,
+            text_task1="Test Text Task1",
+            task2_id=2,
+            text_task2="Test Text Task2",
+            task3_id=3,
+            text_task3="Test Text Task3",
+        )
         response = self.employee_client.post(
             "/api/v1/idps/", data=data, format="json"
         )
