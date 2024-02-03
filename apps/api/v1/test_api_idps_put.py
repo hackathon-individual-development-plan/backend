@@ -11,7 +11,7 @@ class IdpApiTestCase(APITestCase):
     def setUpClass(cls):
         # Создаем пользователя с ролью Сотрудник
         cls.employee_user = User.objects.create(
-            username="employee_user", fio="ФИО", job_title="Employee"
+            username="employee", fio="ФИО", job_title="Employee"
         )
         cls.employee_token = Token.objects.create(user=cls.employee_user)
         cls.employee_client = APIClient()
@@ -24,7 +24,7 @@ class IdpApiTestCase(APITestCase):
 
         # Создаем пользователя с ролью Руководитель
         cls.chief_user = User.objects.create(
-            username="chief_user", fio="ФИО", job_title="Chief"
+            username="chief", fio="ФИО", job_title="Chief"
         )
         cls.chief_token = Token.objects.create(user=cls.chief_user)
         cls.chief_client = APIClient()
@@ -58,7 +58,7 @@ class IdpApiTestCase(APITestCase):
 
     @classmethod
     def tearDownClass(cls):
-        pass
+        User.objects.all().delete()
 
     def check_data(
         self,
