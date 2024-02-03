@@ -95,21 +95,18 @@ class APITestCase(TestCase):
 
     def test_endpoint_create_idps_by_chief(self):
         """Тестирование создания ИПР руководителем."""
-        data = self.check_data(
-            title_idp="Test Idps",
-            status_idp="Test Status Idp",
-            goal_id=1,
-            title_goal="Test Title Goal",
-            deadline="2024-03-08",
-            status_goal="Test Status Goal",
-            description_goal="Test Description Goal",
-            task1_id=1,
-            text_task1="Test Text Task1",
-            task2_id=2,
-            text_task2="Test Text Task2",
-            task3_id=3,
-            text_task3="Test Text Task3",
-        )
+        data = {
+            "title": "Test Idps",
+            "goals": [
+                {
+                    "title": "Test Goal",
+                    "description": "Test Description",
+                    "deadline": "2024-02-03T14:06:31.104Z",
+                    "tasks": [{"text": "Test Task"}],
+                }
+            ],
+            "employee": 1,
+        }
         response = self.chief_client.post(
             "/api/v1/idps/", data=data, format="json"
         )
