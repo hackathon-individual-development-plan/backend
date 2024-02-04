@@ -3,7 +3,7 @@
 ## Оглавление <a id="contents"></a>
 
 1. [О проекте](#about)
-2.  [Авторы проекта](#authors)
+2. [Авторы проекта](#authors)
 3. [Архив с кодом репозитория и скриншотами](#archive)
 4. [Документация](#documentation)
 5. [Стек технологий](#tools)
@@ -44,7 +44,7 @@ MVP индивидуального плана развития для сотру
   Token ac83a1374ee39b726829e34d49ce15138704b737
   ```
 
-Нажать Enter или кликнуть где-то вне поля, чтобы сохранить введенные данные и обновить страницу
+Нажать Enter или кликнуть где-то вне поля, чтобы сохранить введенные данные и обновить страницу.
 
 ## Авторы проекта <a id="authors"></a>
 
@@ -120,7 +120,7 @@ MVP индивидуального плана развития для сотру
 ![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)
 ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=github-actions&logoColor=white)
 
-## Установка зависимостей для работы локально<a id="installation"></a>
+## Установка зависимостей для полного разворачивания проекта локально<a id="installation"></a>
 
 1. Склонируйте репозиторий:
 
@@ -129,53 +129,47 @@ MVP индивидуального плана развития для сотру
     cd backend
   ```
 
-2. Перейдите в infra и создайте .env файл:
+  2. Перейдите в infra и создайте .env.compose файл:
   ```
     cd infra
-    touch infra/.env
+    touch infra/.env.compose
   ```
 
 3. Заполните по примеру своими значениями:
-  [скопируйте этот файл](./infra/.env.example)
+  [скопируйте этот файл](./infra/.env.compose.example)
 
 ## Запуск <a id="start"></a>
 
-Запустите контейнеры с проектом командой:
+Запустите контейнеры с проектом следующей командой:
   ```
-    docker-compose -f infra/docker-compose.yaml up -d
+    docker compose up -d
   ```
-2. Выполните следующие команды:
 
-  ```
-    cd infra
-    docker-compose exec backend python manage.py migrate
-    docker-compose exec backend python manage.py createsuperuser
-    docker-compose exec backend python manage.py collectstatic --no-input
-  ```
+Сборка включает в себя и фронтенд, и бэкенд. Запущенный проект можно посмотреть по [ссылке](http://localhost:8080/employees).
+
 ## Наполнение БД <a id="database"></a>
 
 Наполните БД тестовыми данными:
 
   ```
-    docker-compose exec backend python manage.py fill_db
+    docker compose exec backend python manage.py fill_db
   ```
 ## Тесты и покрытие <a id="tests"></a>
 
 Запустите тесты:
 
   ```
-    docker-compose exec backend python manage.py test
+    docker compose exec backend python manage.py test
   ```
   или
   ```
-    docker-compose exec backend coverage run manage.py test
-    docker-compose exec backend coverage report
+    docker compose exec backend coverage run manage.py test
+    docker compose exec backend coverage report
   ```
 
 Покрытие составляет 97 процентов.
 
 ![Процент покрытия](./media/test_coverage.jpg)
-
 
 ##  Frontend <a id="frontend"></a>
 
