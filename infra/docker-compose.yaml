@@ -38,9 +38,7 @@ services:
       - hackathon-db
 
   frontend:
-    build:
-      context: ../../frontend
-      dockerfile: Dockerfile
+    image: ghcr.io/hackathon-individual-development-plan/frontend:latest
     container_name: frontend
     volumes:
       - frontend_static:/app/build
