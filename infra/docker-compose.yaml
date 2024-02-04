@@ -16,6 +16,11 @@ services:
       - POSTGRES_PORT=${DB_PORT}
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${DB_NAME}'"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
 
   backend:
     build:
@@ -24,7 +29,7 @@ services:
     container_name: backend
     command: >
       sh -c "python manage.py migrate &&
-             python manage.py createsuperuser --no-input --username admin --email admin@example.com || true &&
+             python manage.py createsuperuser --no-input || true &&
              python manage.py collectstatic --no-input --clear &&
              python manage.py runserver 0.0.0.0:8000"
     ports:
@@ -35,10 +40,11 @@ services:
       - backend_static:/app/static/
       - backend_media:/app/media/
     depends_on:
-      - hackathon-db
+      hackathon-db:
+        condition: service_healthy
 
   frontend:
-    image: ghcr.io/hackathon-individual-development-plan/frontend:latest
+    image: esfiro4ka/hackathon-individual-development-plan-frontend:latest
     container_name: frontend
     volumes:
       - frontend_static:/app/build
