@@ -132,7 +132,7 @@ MVP индивидуального плана развития для сотру
   2. Перейдите в infra и создайте .env.compose файл:
   ```
     cd infra
-    touch infra/.env.compose
+    touch .env.compose
   ```
 
 3. Заполните по примеру своими значениями:

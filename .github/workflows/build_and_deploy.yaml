@@ -3,7 +3,7 @@ name: Build and deploy to stage server
 on:
   push:
     branches:
-      - develop
+      - main
 
 env:
   REGISTRY: ghcr.io
@@ -81,7 +81,7 @@ jobs:
             cd ${{ env.DEPLOY_PATH }}
             mv infra/nginx/templates/default.conf.prod.template infra/nginx/templates/default.conf.template
 
-            rm -f infra/.env.compose infra/.env.compose.example infra/.env
+            rm -f infra/.env.compose.example infra/.env
             touch infra/.env
 
             echo NGINX_SERVER_NAME=${{ secrets.NGINX_SERVER_NAME }} >> infra/.env
