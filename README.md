@@ -3,16 +3,17 @@
 ## Оглавление <a id="contents"></a>
 
 1. [О проекте](#about)
-2. [Архив с кодом репозитория и скриншотами](#archive)
-3. [Документация](#documentation)
-4. [Стек технологий](#tools)
-5. [Установка зависимостей](#installation)
-6. [Настройка](#setting)
-7. [Запуск](#start)
-8. [Наполнение БД](#database)
-9. [Тесты и покрытие](#tests)
-10. [Frontend](#frontend)
-11. [Авторы проекта](#authors)
+2.  [Авторы проекта](#authors)
+3. [Архив с кодом репозитория и скриншотами](#archive)
+4. [Документация](#documentation)
+5. [Стек технологий](#tools)
+6. [Установка зависимостей](#installation)
+7. [Настройка](#setting)
+8. [Запуск](#start)
+9. [Наполнение БД](#database)
+10. [Тесты и покрытие](#tests)
+11. [Frontend](#frontend)
+
 
 ## О проекте <a id="about"></a>
 
@@ -28,6 +29,54 @@ MVP индивидуального плана развития для сотру
   Роль руководителя: {AlfaIprProjectToken: Token ...}
 ```
 
+## Авторы проекта <a id="authors"></a>
+
+Команда:
+
+- Product manager
+  - Никитин Валентин
+
+- Project manager
+  - Кутицкий Владислав
+
+- Business analytics
+  - Щетинина Наталья
+  - Михненко Елена
+
+- System analytics
+  - Богатков Павел
+  - Бибикова Вера
+
+- Designers
+  - Викулов Юрий
+  - Конева Татьяна
+  - Перадзе Мария
+
+- Frontend
+  - [Александрова Светлана](https://github.com/SvetAlexa)
+  - [Тихонова Ксения](https://github.com/TikhonovaKs)
+  - [Фрикина София](https://github.com/SofiaFrikina)
+
+- Backend
+  - [Ротбардт Ольга](https://github.com/esfiro4ka)
+    * настройка CI/CD, деплой проекта на сервер
+    * проверка миграций и тестирования на GitHub
+    * создание моделей (пользователи и все что с ними связано)
+    * обработка эндпоинтов (пользователи)
+    * тестирование моделей ипр
+  - [Дунаева Клавдия](https://github.com/KlavaD)
+    * настройка pre-commit
+    * создание моделей (ИПР и все что с ними связано)
+    * обработка эндпоинтов (ИПР)
+    * настройка админки
+    * тестирование (PUT запрос ИПР; GET, POST запросы комментарии)
+  - [Ковалев Никита](https://github.com/NV-Kovalev)
+    * авторизация
+    * тестирование (эндпоинты пользователей)
+  - [Лашков Павел](https://github.com/hutji)
+    * тестирование (модели пользователей; POST запрос ИПР)
+
+
 ## Архив с кодом репозитория и скриншотами <a id="archive"></a>
 
 ...
@@ -36,11 +85,9 @@ MVP индивидуального плана развития для сотру
 
 Документация сгенерирована автоматически при помощи drf-spectacular.
 
-Swagger:
-[https://yahackathon.ddns.net/api/schema/docs/#/](https://yahackathon.ddns.net/api/schema/docs/#/)
+[Swagger](https://yahackathon.ddns.net/api/schema/docs/#/)
 
-Redoc:
-[https://yahackathon.ddns.net/api/schema/redoc/](https://yahackathon.ddns.net/api/schema/redoc/)
+[Redoc](https://yahackathon.ddns.net/api/schema/redoc/)
 
 ## Стек технологий <a id="tools"></a>
 
@@ -90,9 +137,9 @@ Redoc:
   > согласно принятому в команде codestyle.
   > Можно запустить pre-commit без коммита, чтобы посмотреть как работает,
   > командой:
-  ```
-    pre-commit run --all-files
-  ```
+    ```
+      pre-commit run --all-files
+    ```
 
 2. Перейдите в infra и создайте .env файл:
   ```
@@ -100,7 +147,7 @@ Redoc:
     touch infra/.env
   ```
 
-3. Заполните по примеру со своими значениями:
+3. Заполните по примеру своими значениями:
   [скопируйте этот файл](./infra/.env.example)
 
 ## Запуск <a id="start"></a>
@@ -147,38 +194,5 @@ Redoc:
 
 [https://github.com/hackathon-individual-development-plan/frontend](https://github.com/hackathon-individual-development-plan/frontend)
 
-## Авторы проекта <a id="authors"></a>
-
-Команда:
-
-- Product manager
-  - Никитин Валентин
-
-- Project manager
-  - Кутицкий Владислав
-
-- Business analytics
-  - Щетинина Наталья
-  - Михненко Елена
-
-- System analytics
-  - Богатков Павел
-  - Бибикова Вера
-
-- Designers
-  - Викулов Юрий
-  - Конева Татьяна
-  - Перадзе Мария
-
-- Frontend
-  - [Александрова Светлана](https://github.com/SvetAlexa)
-  - [Тихонова Ксения](https://github.com/TikhonovaKs)
-  - [Фрикина София](https://github.com/SofiaFrikina)
-
-- Backend
-  - [Ротбардт Ольга](https://github.com/esfiro4ka)
-  - [Дунаева Клавдия](https://github.com/KlavaD)
-  - [Ковалев Никита](https://github.com/NV-Kovalev)
-  - [Лашков Павел](https://github.com/hutji)
 
 [Оглавление](#contents)
