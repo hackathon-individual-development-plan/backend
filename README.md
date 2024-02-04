@@ -200,6 +200,7 @@ MVP индивидуального плана развития для сотру
 
 ![Процент покрытия](https://github.com/hackathon-individual-development-plan/backend/media/test_coverage.jpg)
 
+
 ##  Frontend <a id="frontend"></a>
 
 [https://github.com/hackathon-individual-development-plan/frontend](https://github.com/hackathon-individual-development-plan/frontend)
