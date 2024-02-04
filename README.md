@@ -25,9 +25,14 @@ MVP индивидуального плана развития для сотру
 Мы создали продукт, который должен работать внутри приложения Alfa People. Поэтому явная авторизация в системе не предусмотрена. Однако, чтобы проверить работу системы, можно авторизоваться через headers.
 
 Для работы на сайте под разными ролями вам потребуются токены, которые следует прописать в инструментах разработчика->Application->Local Storage:
+
+Роль сотрудника:
 ```
-  Роль сотрудника: {AlfaIprProjectToken: Token ...}
-  Роль руководителя: {AlfaIprProjectToken: Token ...}
+  {AlfaIprProjectToken: Token ac83a1374ee39b726829e34d49ce15138704b737}
+```
+Роль руководителя:
+```
+{AlfaIprProjectToken: Token 08c8b74340e79ea26fbb73a9cc398c79fd36d77c}
 ```
 
 ## Авторы проекта <a id="authors"></a>
@@ -162,17 +167,9 @@ MVP индивидуального плана развития для сотру
 
 ## Запуск в контейнере <a id="start"></a>
 
-1. Запустите контейнеры с проектом командой:
+Запустите контейнеры с проектом командой:
   ```
     docker-compose -f infra/docker-compose.yml up -d
-  ```
-2. Выполните следующие команды:
-
-  ```
-
-    docker-compose exec backend python manage.py migrate
-    docker-compose exec backend python manage.py createsuperuser
-    docker-compose exec backend python manage.py collectstatic --no-input
   ```
 
 ## Наполнение БД <a id="database"></a>
@@ -201,7 +198,7 @@ MVP индивидуального плана развития для сотру
 
 Покрытие составляет 97 процентов.
 
-... КАРТИНКА ...
+[Процент покрытия](https://github.com/hackathon-individual-development-plan/backend/media/test_coverage.jpg)
 
 ##  Frontend <a id="frontend"></a>
 
