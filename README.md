@@ -45,8 +45,7 @@ MVP индивидуального плана развития для сотру
   Token ac83a1374ee39b726829e34d49ce15138704b737
   ```
 
-* нажать Enter или кликнуть где-то вне поля, чтобы сохранить введенные данные
-* обновить страницу
+Нажать Enter или кликнуть где-то вне поля, чтобы сохранить введенные данные и обновить страницу
 
 ## Авторы проекта <a id="authors"></a>
 
@@ -214,9 +213,7 @@ MVP индивидуального плана развития для сотру
 ![Процент покрытия](./media/test_coverage.jpg)
 
 
-##  Frontend <a id="frontend"></a>
-
-[https://github.com/hackathon-individual-development-plan/frontend](https://github.com/hackathon-individual-development-plan/frontend)
+##  [Frontend](https://github.com/hackathon-individual-development-plan/frontend) <a id="frontend"></a>
 
 
 [Оглавление](#contents)
