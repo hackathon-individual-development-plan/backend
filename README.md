@@ -157,7 +157,7 @@ MVP индивидуального плана развития для сотру
 3. Заполните по примеру своими значениями:
   [скопируйте этот файл](./infra/.env.example)
 
-### Запуск локально <a id="startlocal"></a>
+## Запуск локально <a id="startlocal"></a>
  ```
     python3 manage.py runserver
     python3 manage.py migrate
