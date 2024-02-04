@@ -7,7 +7,7 @@ from apps.idps.models import Comment, Goal, Idp, Task
 
 class TaskForIprAdmin(nested_admin.NestedTabularInline):
     model = Task
-    fields = ["text"]
+    fields = ("text",)
     min_num = 1
     extra = 0
 
@@ -16,7 +16,7 @@ class GoalForIprAdmin(nested_admin.NestedStackedInline):
     model = Goal
     min_num = 1
     extra = 0
-    inlines = [TaskForIprAdmin]
+    inlines = (TaskForIprAdmin,)
 
 
 @admin.register(Task)
@@ -68,7 +68,7 @@ class IdpAdmin(nested_admin.NestedModelAdmin):
     )
     search_fields = ("title", "chief", "employee", "status")
     list_filter = ("created_at", "chief", "employee", "status")
-    inlines = [GoalForIprAdmin]
+    inlines = (GoalForIprAdmin,)
     exclude = ("finished_at",)
     empty_value_display = "-пусто-"
 
