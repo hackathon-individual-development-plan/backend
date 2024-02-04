@@ -9,7 +9,8 @@
 5. [Стек технологий](#tools)
 6. [Установка зависимостей](#installation)
 7. [Настройка](#setting)
-8. [Запуск](#start)
+8. [Запуск локально](#startlocal)
+8. [Запуск в контейнере](#start)
 9. [Наполнение БД](#database)
 10. [Тесты и покрытие](#tests)
 11. [Frontend](#frontend)
@@ -81,7 +82,7 @@ MVP индивидуального плана развития для сотру
 
 ## Архив с кодом репозитория и скриншотами <a id="archive"></a>
 
-...
+  [ЯндексДиск](https://disk.yandex.ru/d/2zvYj-K8zfXQVw)
 
 ## Документация <a id="documentation"></a>
 
@@ -103,7 +104,7 @@ MVP индивидуального плана развития для сотру
 ![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)
 ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=github-actions&logoColor=white)
 
-## Установка зависимостей<a id="installation"></a>
+## Установка зависимостей для работы локально<a id="installation"></a>
 
 1. Склонируйте репозитории фронтенда и бэкенда, положив их рядом друг с другом, на локальную машину и перейдите в бэкенд:
 
@@ -137,8 +138,7 @@ MVP индивидуального плана развития для сотру
   > Перед каждым коммитом будет запущен линтер и форматтер,
   > который автоматически отформатирует код
   > согласно принятому в команде codestyle.
-  > Можно запустить pre-commit без коммита, чтобы посмотреть как работает,
-  > командой:
+  > Можно запустить pre-commit без коммита командой:
     ```
       pre-commit run --all-files
     ```
@@ -152,29 +152,40 @@ MVP индивидуального плана развития для сотру
 3. Заполните по примеру своими значениями:
   [скопируйте этот файл](./infra/.env.example)
 
-## Запуск <a id="start"></a>
-
-1. Запустите контейнеры с проектом командой:
-  ```
-    docker-compose -f infra/docker-compose.yml up -d
-  ```
-2. Запустите проект:
-
-  ```
-    cd ..
+### Запуск локально <a id="startlocal"></a>
+ ```
+    python3 manage.py runserver
     python3 manage.py migrate
     python3 manage.py createsuperuser
     python3 manage.py runserver
   ```
 
+## Запуск в контейнере <a id="start"></a>
+
+1. Запустите контейнеры с проектом командой:
+  ```
+    docker-compose -f infra/docker-compose.yml up -d
+  ```
+2. Выполните следующие команды:
+
+  ```
+
+    docker-compose exec backend python manage.py migrate
+    docker-compose exec backend python manage.py createsuperuser
+    docker-compose exec backend python manage.py collectstatic --no-input
+  ```
+
 ## Наполнение БД <a id="database"></a>
 
 Наполните БД тестовыми данными:
-
+* локально
   ```
     python3 manage.py fill_db
   ```
-
+* в контейнере
+  ```
+    docker-compose exec backend python manage.py fill_db
+  ```
 ## Тесты и покрытие <a id="tests"></a>
 
 Запустите тесты:
