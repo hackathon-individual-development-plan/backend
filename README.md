@@ -198,7 +198,7 @@ MVP индивидуального плана развития для сотру
 
 Покрытие составляет 97 процентов.
 
-![Процент покрытия](https://github.com/hackathon-individual-development-plan/backend/media/test_coverage.jpg)
+![Процент покрытия](./media/test_coverage.jpg)
 
 
 ##  Frontend <a id="frontend"></a>
